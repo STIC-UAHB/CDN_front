@@ -1,0 +1,161 @@
+<div class="layout">
+
+  <!-- ── SIDEBAR ── -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-sq">BN</div>
+      <span class="logo-nm">BabelNotif</span>
+    </div>
+
+    <nav class="sidebar-nav">
+      <div class="nav-label">PRINCIPAL</div>
+      <a class="nav-item" [class.active]="activeMenu() === 'dashboard'" (click)="activeMenu.set('dashboard')">
+        <span class="nav-icon">▦</span> Dashboard
+      </a>
+      <a class="nav-item" [class.active]="activeMenu() === 'notifications'" (click)="activeMenu.set('notifications')">
+        <span class="nav-icon">🔔</span> Notifications
+      </a>
+      <a class="nav-item" [class.active]="activeMenu() === 'preferences'" (click)="activeMenu.set('preferences')">
+        <span class="nav-icon">⚙</span> Préférences
+      </a>
+
+      <div class="nav-label" style="margin-top:20px">COMPTE</div>
+      <a class="nav-item" [class.active]="activeMenu() === 'apikey'" (click)="activeMenu.set('apikey')">
+        <span class="nav-icon">🔑</span> Clé API
+      </a>
+      <a class="nav-item" [class.active]="activeMenu() === 'settings'" (click)="activeMenu.set('settings')">
+        <span class="nav-icon">◎</span> Paramètres
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <button class="btn-logout" (click)="logout()">↩ Déconnexion</button>
+    </div>
+  </aside>
+
+  <!-- ── CONTENU PRINCIPAL ── -->
+  <main class="main">
+
+    <!-- TOPBAR -->
+    <div class="topbar">
+      <div class="topbar-left">
+        <span class="topbar-title">Account Dashboard</span>
+      </div>
+      <div class="topbar-right">
+        <div class="topbar-account">
+          <span class="account-dot"></span>
+          <span class="account-name">{{ nom() }}</span>
+          <span class="account-badge">Actif</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- BANNER QUOTA -->
+    <div class="banner-info">
+      <span class="banner-ic">◆</span>
+      Quota mensuel : <strong>{{ quotaUtilise() }} / {{ quotaMensuel() }}</strong> notifications utilisées.
+      <div class="banner-bar">
+        <div class="banner-fill" [style.width]="quotaPct + '%'"></div>
+      </div>
+    </div>
+
+    <!-- CARDS STATS -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-label">Notifications envoyées</div>
+        <div class="stat-value">{{ quotaUtilise() }}</div>
+        <div class="stat-sub">ce mois</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Quota restant</div>
+        <div class="stat-value">{{ quotaMensuel() - quotaUtilise() }}</div>
+        <div class="stat-sub">notifications disponibles</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Taux d'utilisation</div>
+        <div class="stat-value">{{ quotaPct }}%</div>
+        <div class="stat-sub">du quota mensuel</div>
+      </div>
+      <div class="stat-card green">
+        <div class="stat-label">Statut du compte</div>
+        <div class="stat-value">✓ Actif</div>
+        <div class="stat-sub">compte vérifié</div>
+      </div>
+    </div>
+
+    <!-- ACCOUNT INFO (comme Twilio) -->
+    <div class="info-section">
+      <div class="info-col">
+        <div class="info-card">
+          <div class="info-card-title">▾ Informations du compte</div>
+
+          <div class="info-row">
+            <div class="info-field-label">Nom de l'application</div>
+            <div class="info-field-val">{{ nom() }}</div>
+          </div>
+
+          <div class="info-row">
+            <div class="info-field-label">API Key</div>
+            <div class="key-wrap">
+              <input
+                class="key-input"
+                [type]="showApiKey() ? 'text' : 'password'"
+                [value]="apiKey()"
+                readonly
+              >
+              <button class="key-btn" (click)="showApiKey.set(!showApiKey())">
+                {{ showApiKey() ? '🙈' : '👁' }}
+              </button>
+              <button class="key-btn copy-btn" (click)="copyKey()" title="Copier">
+                ⧉
+              </button>
+            </div>
+            <div class="key-warn">
+              ⚠ Gardez cette clé secrète. Ne la partagez jamais publiquement.
+            </div>
+          </div>
+
+          <div class="info-row">
+            <div class="info-field-label">Quota mensuel</div>
+            <div class="info-field-val">{{ quotaMensuel() | number }} notifications/mois</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- QUICK START -->
+      <div class="info-col">
+        <div class="info-card">
+          <div class="info-card-title">▾ Démarrage rapide</div>
+          <p class="quickstart-desc">Intégrez BabelNotif dans votre application en quelques minutes.</p>
+          <div class="quickstart-list">
+            <div class="qs-item">
+              <div class="qs-dot"></div>
+              <div>
+                <div class="qs-title">Envoyer une notification</div>
+                <code class="qs-code">POST /api/notify</code>
+              </div>
+            </div>
+            <div class="qs-item">
+              <div class="qs-dot"></div>
+              <div>
+                <div class="qs-title">Header requis</div>
+                <code class="qs-code">Authorization: Bearer {{'{'}}votre_api_key{{'}'}}</code>
+              </div>
+            </div>
+            <div class="qs-item">
+              <div class="qs-dot"></div>
+              <div>
+                <div class="qs-title">4 canaux disponibles</div>
+                <code class="qs-code">sms · email · push · socket</code>
+              </div>
+            </div>
+          </div>
+          <div class="api-keys-link">
+            API Keys · <a (click)="activeMenu.set('apikey')">Voir ma clé complète</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>

@@ -1,0 +1,241 @@
+<!-- ══════════════════════════════════════ -->
+<!--  ÉTAPE 1 — INSCRIPTION               -->
+<!-- ══════════════════════════════════════ -->
+@if (step() === 'register') {
+<div class="page">
+  <div class="left">
+    <div class="left-badge">◆ Notifications SaaS</div>
+    <h2>Commencez à envoyer des notifications <span>dès aujourd'hui</span></h2>
+    <p>Essayez BabelNotif gratuitement et déverrouillez tous les canaux de notification.</p>
+    <ul class="check-list">
+      <li><span class="check-icon"></span>Aucune carte bancaire requise</li>
+      <li><span class="check-icon"></span>SMS, Email, Push & WebSocket</li>
+      <li><span class="check-icon"></span>Orange API intégrée</li>
+      <li><span class="check-icon"></span>10 000 notifications offertes</li>
+    </ul>
+    <div class="steps-label">Comment démarrer</div>
+    <div class="steps">
+      <div class="step"><div class="step-num active-num">1</div>Créez votre compte</div>
+      <div class="step"><div class="step-num">2</div>Choisissez le canal OTP</div>
+      <div class="step"><div class="step-num">3</div>Vérifiez votre identité</div>
+      <div class="step"><div class="step-num">4</div>Accédez au Dashboard</div>
+    </div>
+  </div>
+  <div class="right">
+    <div class="form-box">
+      <h1>Créer un compte</h1>
+      <p class="subtitle">
+        Commencez gratuitement — aucune carte requise.<br>
+        Déjà inscrit ? <a (click)="goTo('login')">Se connecter</a>
+      </p>
+      <div class="form-group">
+        <label>Nom de l'application *</label>
+        <input type="text" #nom placeholder="ex: websms, monapp...">
+      </div>
+      <div class="form-group">
+        <label>Email de contact *</label>
+        <input type="email" #emailInp placeholder="admin@monapp.sn">
+      </div>
+      <div class="form-group">
+        <label>Téléphone *</label>
+        <input type="text" #tel placeholder="221771234567">
+      </div>
+      <div class="form-group">
+        <label>Mot de passe *</label>
+        <div class="input-wrap">
+          <input [type]="showRegPwd() ? 'text' : 'password'" #pwd placeholder="8 caractères minimum">
+          <button class="eye-btn" (click)="showRegPwd.set(!showRegPwd())">{{ showRegPwd() ? '🙈' : '👁' }}</button>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Confirmer le mot de passe *</label>
+        <div class="input-wrap">
+          <input [type]="showRegPwd() ? 'text' : 'password'" #pwdConf placeholder="Répétez le mot de passe">
+        </div>
+      </div>
+      <div class="info-banner">
+        ✓ Quota de départ : <strong>10 000 notifications/mois</strong>
+      </div>
+      <div class="terms-row">
+        <input type="checkbox" id="terms">
+        <span>J'accepte les <a href="#">Conditions d'utilisation</a> et la <a href="#">Politique de confidentialité</a>.</span>
+      </div>
+      @if (erreur()) {
+        <div class="erreur-banner">⚠️ {{ erreur() }}</div>
+      }
+      <button class="btn-submit" [disabled]="loading()"
+        (click)="register(nom.value, emailInp.value, tel.value, pwd.value, pwdConf.value)">
+        {{ loading() ? 'Création...' : 'Créer mon compte →' }}
+      </button>
+      <p class="switch-link">
+        Déjà un compte ? <button (click)="goTo('login')">Se connecter</button>
+      </p>
+    </div>
+  </div>
+</div>
+}
+
+<!-- ══════════════════════════════════════ -->
+<!--  ÉTAPE 2 — CHOIX DU CANAL OTP        -->
+<!-- ══════════════════════════════════════ -->
+@if (step() === 'canal') {
+<div class="page center-page">
+  <div class="otp-card">
+    <div class="otp-icon-wrap">
+      <div class="otp-icon">🔐</div>
+    </div>
+    <h2>Vérifiez votre identité</h2>
+    <p class="otp-sub">
+      Comment souhaitez-vous recevoir votre code de vérification ?
+    </p>
+
+    <div class="canal-choices">
+      <div class="canal-card" (click)="choisirCanal('email')">
+        <div class="canal-icon">📧</div>
+        <div class="canal-info">
+          <div class="canal-title">Par Email</div>
+          <div class="canal-desc">{{ maskEmail(email()) }}</div>
+        </div>
+        <div class="canal-arrow">→</div>
+      </div>
+      <div class="canal-card" (click)="choisirCanal('sms')">
+        <div class="canal-icon">📱</div>
+        <div class="canal-info">
+          <div class="canal-title">Par SMS</div>
+          <div class="canal-desc">{{ maskPhone(telephone()) }}</div>
+        </div>
+        <div class="canal-arrow">→</div>
+      </div>
+    </div>
+
+    <button class="btn-back" (click)="goTo('register')">← Retour</button>
+  </div>
+</div>
+}
+
+<!-- ══════════════════════════════════════ -->
+<!--  ÉTAPE 3 — SAISIE OTP                -->
+<!-- ══════════════════════════════════════ -->
+@if (step() === 'otp') {
+<div class="page center-page">
+  <div class="otp-card">
+    <!-- Illustration enveloppe / SMS -->
+    <div class="otp-illustration">
+      @if (canal() === 'email') {
+        <div class="illus-email">✉️</div>
+      } @else {
+        <div class="illus-sms">📱</div>
+      }
+    </div>
+
+    <h2>
+      @if (canal() === 'email') { Vérifiez votre email }
+      @else { Vérifiez votre téléphone }
+    </h2>
+
+    <p class="otp-sub">
+      Nous avons envoyé un code à
+      @if (canal() === 'email') {
+        <strong>{{ maskEmail(email()) }}</strong>
+      } @else {
+        <strong>{{ maskPhone(telephone()) }}</strong>
+      }
+    </p>
+
+    <!-- 6 cases OTP -->
+    <div class="otp-inputs">
+      @for (digit of otpDigits(); track $index) {
+        <input
+          [id]="'otp-' + $index"
+          class="otp-input"
+          type="text"
+          inputmode="numeric"
+          maxlength="1"
+          [value]="digit"
+          (input)="onOtpInput($event, $index)"
+          (keydown)="onOtpKeydown($event, $index)"
+        >
+      }
+    </div>
+
+    <!-- Timer -->
+    <div class="timer-wrap">
+      @if (timer() > 0) {
+        <span class="timer-text">⏱ Code expire dans <strong>{{ timerLabel() }}</strong></span>
+      } @else {
+        <span class="timer-expired">⚠️ Code expiré — demandez un nouveau code</span>
+      }
+    </div>
+
+    @if (erreur()) {
+      <div class="erreur-banner">⚠️ {{ erreur() }}</div>
+    }
+    <button class="btn-submit"
+      [disabled]="getOtpCode().length < 6 || loading()"
+      (click)="verifierOtp()">
+      {{ loading() ? 'Vérification...' : 'Vérifier →' }}
+    </button>
+
+    <!-- Renvoyer le code -->
+    <div class="resend-section">
+      <p class="resend-label">Code non reçu ? Renvoyer via :</p>
+      <div class="resend-btns">
+        <button class="resend-btn" (click)="renvoyerOtp('email')">📧 Email</button>
+        <button class="resend-btn" (click)="renvoyerOtp('sms')">📱 SMS</button>
+      </div>
+    </div>
+
+    <button class="btn-back" (click)="goTo('canal')">← Changer de canal</button>
+  </div>
+</div>
+}
+
+<!-- ══════════════════════════════════════ -->
+<!--  PAGE CONNEXION                       -->
+<!-- ══════════════════════════════════════ -->
+@if (step() === 'login') {
+<div class="page">
+  <div class="left">
+    <div class="left-badge">◆ Bon retour parmi nous</div>
+    <h2>Gérez vos <span>notifications</span> en un seul endroit</h2>
+    <p>Accédez à votre tableau de bord, vos statistiques et vos intégrations API.</p>
+    <ul class="check-list">
+      <li><span class="check-icon"></span>Tableau de bord en temps réel</li>
+      <li><span class="check-icon"></span>Historique des envois</li>
+      <li><span class="check-icon"></span>Gestion des clés API</li>
+      <li><span class="check-icon"></span>Support prioritaire</li>
+    </ul>
+  </div>
+  <div class="right">
+    <div class="form-box">
+      <h1>Se connecter</h1>
+      <p class="subtitle">
+        Bienvenue ! Entrez vos identifiants.<br>
+        Pas encore de compte ? <a (click)="goTo('register')">S'inscrire gratuitement</a>
+      </p>
+      <div class="form-group">
+        <label>Email de contact</label>
+        <input type="email" #loginEmail placeholder="admin@monapp.sn">
+      </div>
+      <div class="form-group">
+        <label>Mot de passe</label>
+        <div class="input-wrap">
+          <input [type]="showLoginPwd() ? 'text' : 'password'" #loginPwd placeholder="Votre mot de passe">
+          <button class="eye-btn" (click)="showLoginPwd.set(!showLoginPwd())">{{ showLoginPwd() ? '🙈' : '👁' }}</button>
+        </div>
+      </div>
+      <div class="forgot"><a href="#">Mot de passe oublié ?</a></div>
+      @if (erreur()) {
+        <div class="erreur-banner">⚠️ {{ erreur() }}</div>
+      }
+      <button class="btn-submit" [disabled]="loading()"
+        (click)="login(loginEmail.value, loginPwd.value)">
+        {{ loading() ? 'Connexion...' : 'Se connecter →' }}
+      </button>
+      <p class="switch-link">
+        Pas de compte ? <button (click)="goTo('register')">S'inscrire gratuitement</button>
+      </p>
+    </div>
+  </div>
+</div>
+}
