@@ -1,0 +1,110 @@
+<div class="section">
+
+  <div class="section-header">
+    <div>
+      <div class="section-title">Règles de notification</div>
+      <div class="section-sub">Définissez les événements qui déclenchent des notifications pour vos utilisateurs.</div>
+    </div>
+    <div class="section-actions">
+      <button class="btn-template" (click)="telechargerTemplate()">⬇ Template JSON</button>
+      <label class="btn-import">
+        ⬆ Importer JSON
+        <input type="file" accept=".json" (change)="importer($event)" hidden>
+      </label>
+      <button class="btn-primary" (click)="showForm.set(!showForm())">+ Nouvelle règle</button>
+    </div>
+  </div>
+
+  @if (erreur()) { <div class="form-error">{{ erreur() }}</div> }
+  @if (succes()) { <div class="form-success">{{ succes() }}</div> }
+
+  <!-- Formulaire nouvelle règle -->
+  @if (showForm()) {
+    <div class="form-card">
+      <div class="form-title">Nouvelle règle</div>
+
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Code événement *</label>
+          <input type="text" placeholder="ex: quota_50" [value]="form().event_code"
+            (input)="setField('event_code', $any($event.target).value)">
+        </div>
+        <div class="form-group">
+          <label>Description</label>
+          <input type="text" placeholder="ex: Quota à 50%" [value]="form().description"
+            (input)="setField('description', $any($event.target).value)">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Message template *</label>
+        <textarea [placeholder]="templatePlaceholder" rows="3"
+          [value]="form().message_template"
+          (input)="setField('message_template', $any($event.target).value)"></textarea>
+        <div class="form-hint">Utilisez {{ '{' }}variable{{ '}' }} pour les valeurs dynamiques.</div>
+      </div>
+
+      <div class="form-group">
+        <label>Canaux par défaut</label>
+        <div class="canal-checks">
+          <label class="check-item">
+            <input type="checkbox" [checked]="form().sms_actif"
+              (change)="setField('sms_actif', $any($event.target).checked)"> SMS
+          </label>
+          <label class="check-item">
+            <input type="checkbox" [checked]="form().email_actif"
+              (change)="setField('email_actif', $any($event.target).checked)"> Email
+          </label>
+          <label class="check-item">
+            <input type="checkbox" [checked]="form().push_actif"
+              (change)="setField('push_actif', $any($event.target).checked)"> Push
+          </label>
+          <label class="check-item">
+            <input type="checkbox" [checked]="form().socket_actif"
+              (change)="setField('socket_actif', $any($event.target).checked)"> WebSocket
+          </label>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="check-item">
+          <input type="checkbox" [checked]="form().non_desactivable"
+            (change)="setField('non_desactivable', $any($event.target).checked)">
+          Non désactivable (l'utilisateur ne peut pas désactiver cette règle)
+        </label>
+      </div>
+
+      <div class="form-footer">
+        <button class="btn-cancel" (click)="showForm.set(false)">Annuler</button>
+        <button class="btn-primary" [disabled]="loading()" (click)="creer()">{{ btnLabel }}</button>
+      </div>
+    </div>
+  }
+
+  <!-- Liste des règles -->
+  @if (regles().length === 0) {
+    <div class="empty-state">Aucune règle définie. Créez votre première règle ci-dessus.</div>
+  } @else {
+    <div class="regles-list">
+      @for (regle of regles(); track regle.id) {
+        <div class="regle-card">
+          <div class="regle-top">
+            <code class="regle-code">{{ regle.event_code }}</code>
+            <div class="regle-canaux">
+              @if (regle.sms_actif)   { <span class="canal-badge sms">SMS</span> }
+              @if (regle.email_actif) { <span class="canal-badge email">Email</span> }
+              @if (regle.push_actif)    { <span class="canal-badge push">Push</span> }
+              @if (regle.socket_actif)      { <span class="canal-badge socket">WebSocket</span> }
+              @if (regle.non_desactivable) { <span class="canal-badge locked">Obligatoire</span> }
+            </div>
+          </div>
+          <div class="regle-msg">{{ regle.message_template }}</div>
+          @if (regle.description) {
+            <div class="regle-desc">{{ regle.description }}</div>
+          }
+        </div>
+      }
+    </div>
+  }
+
+</div>

@@ -23,6 +23,7 @@
   </div>
   <div class="right">
     <div class="form-box">
+      <button class="btn-accueil" (click)="allerAccueil()">← Accueil</button>
       <h1>Créer un compte</h1>
       <p class="subtitle">
         Commencez gratuitement — aucune carte requise.<br>
@@ -208,6 +209,7 @@
   </div>
   <div class="right">
     <div class="form-box">
+      <button class="btn-accueil" (click)="allerAccueil()">← Accueil</button>
       <h1>Se connecter</h1>
       <p class="subtitle">
         Bienvenue ! Entrez vos identifiants.<br>
@@ -224,7 +226,7 @@
           <button class="eye-btn" (click)="showLoginPwd.set(!showLoginPwd())">{{ showLoginPwd() ? '🙈' : '👁' }}</button>
         </div>
       </div>
-      <div class="forgot"><a href="#">Mot de passe oublié ?</a></div>
+      <div class="forgot"><a (click)="goTo('forgot')">Mot de passe oublié ?</a></div>
       @if (erreur()) {
         <div class="erreur-banner">⚠️ {{ erreur() }}</div>
       }
@@ -236,6 +238,104 @@
         Pas de compte ? <button (click)="goTo('register')">S'inscrire gratuitement</button>
       </p>
     </div>
+  </div>
+</div>
+}
+
+<!-- ══════════════════════════════════════ -->
+<!--  MOT DE PASSE OUBLIÉ — EMAIL          -->
+<!-- ══════════════════════════════════════ -->
+@if (step() === 'forgot') {
+<div class="page center-page">
+  <div class="otp-card">
+    <div class="otp-icon-wrap"><div class="otp-icon">🔑</div></div>
+    <h2>Mot de passe oublié</h2>
+    <p class="otp-sub">Saisissez votre email pour recevoir un code de vérification.</p>
+    <div class="form-group" style="width:100%;margin-bottom:16px;">
+      <input type="email" placeholder="admin@monapp.sn" (input)="forgotEmail.set($any($event.target).value)" style="width:100%;padding:10px 14px;border-radius:8px;border:1px solid #334155;background:#0f1117;color:#e2e8f0;font-size:14px;">
+    </div>
+    @if (erreur()) {
+      <div class="erreur-banner">⚠️ {{ erreur() }}</div>
+    }
+    <button class="btn-submit" [disabled]="loading()" (click)="demanderReset(forgotEmail())">
+      {{ loading() ? 'Envoi...' : 'Envoyer le code →' }}
+    </button>
+    <button class="btn-back" (click)="goTo('login')">← Retour</button>
+  </div>
+</div>
+}
+
+<!-- ══════════════════════════════════════ -->
+<!--  MOT DE PASSE OUBLIÉ — OTP            -->
+<!-- ══════════════════════════════════════ -->
+@if (step() === 'forgot-otp') {
+<div class="page center-page">
+  <div class="otp-card">
+    <div class="otp-illustration"><div class="illus-email">✉️</div></div>
+    <h2>Vérifiez votre email</h2>
+    <p class="otp-sub">Code envoyé à <strong>{{ maskEmail(forgotEmail()) }}</strong></p>
+
+    <div class="otp-inputs">
+      @for (digit of otpDigits(); track $index) {
+        <input
+          [id]="'otp-' + $index"
+          class="otp-input"
+          type="text"
+          inputmode="numeric"
+          maxlength="1"
+          [value]="digit"
+          (input)="onOtpInput($event, $index)"
+          (keydown)="onOtpKeydown($event, $index)"
+        >
+      }
+    </div>
+
+    <div class="timer-wrap">
+      @if (timer() > 0) {
+        <span class="timer-text">⏱ Code expire dans <strong>{{ timerLabel() }}</strong></span>
+      } @else {
+        <span class="timer-expired">⚠️ Code expiré</span>
+      }
+    </div>
+
+    @if (erreur()) {
+      <div class="erreur-banner">⚠️ {{ erreur() }}</div>
+    }
+    <button class="btn-submit" [disabled]="getOtpCode().length < 6" (click)="verifierOtpReset()">
+      Continuer →
+    </button>
+    <div class="resend-section">
+      <p class="resend-label">Code non reçu ?</p>
+      <div class="resend-btns">
+        <button class="resend-btn" (click)="demanderReset(forgotEmail())">🔄 Renvoyer</button>
+      </div>
+    </div>
+    <button class="btn-back" (click)="goTo('forgot')">← Retour</button>
+  </div>
+</div>
+}
+
+<!-- ══════════════════════════════════════ -->
+<!--  MOT DE PASSE OUBLIÉ — NOUVEAU MDP    -->
+<!-- ══════════════════════════════════════ -->
+@if (step() === 'new-password') {
+<div class="page center-page">
+  <div class="otp-card">
+    <div class="otp-icon-wrap"><div class="otp-icon">🔒</div></div>
+    <h2>Nouveau mot de passe</h2>
+    <p class="otp-sub">Choisissez un nouveau mot de passe pour votre compte.</p>
+    <div class="form-group" style="width:100%;margin-bottom:12px;">
+      <input [type]="showRegPwd() ? 'text' : 'password'" (input)="newPwd.set($any($event.target).value)" placeholder="Nouveau mot de passe (8 min.)" style="width:100%;padding:10px 14px;border-radius:8px;border:1px solid #334155;background:#0f1117;color:#e2e8f0;font-size:14px;">
+    </div>
+    <div class="form-group" style="width:100%;margin-bottom:16px;">
+      <input [type]="showRegPwd() ? 'text' : 'password'" (input)="newPwdConf.set($any($event.target).value)" placeholder="Confirmer le mot de passe" style="width:100%;padding:10px 14px;border-radius:8px;border:1px solid #334155;background:#0f1117;color:#e2e8f0;font-size:14px;">
+    </div>
+    @if (erreur()) {
+      <div class="erreur-banner">⚠️ {{ erreur() }}</div>
+    }
+    <button class="btn-submit" [disabled]="loading()" (click)="reinitialiserPassword(newPwd(), newPwdConf())">
+      {{ loading() ? 'Enregistrement...' : 'Enregistrer →' }}
+    </button>
   </div>
 </div>
 }

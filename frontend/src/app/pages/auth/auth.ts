@@ -1,9 +1,9 @@
-import { Component, signal, OnDestroy, inject } from '@angular/core';
+import { Component, signal, OnDestroy, OnInit, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 
-type Step = 'register' | 'login' | 'canal' | 'otp';
+type Step = 'register' | 'login' | 'canal' | 'otp' | 'forgot' | 'forgot-otp' | 'new-password';
 
 @Component({
   selector: 'app-auth',
@@ -11,9 +11,10 @@ type Step = 'register' | 'login' | 'canal' | 'otp';
   templateUrl: './auth.html',
   styleUrl: './auth.css',
 })
-export class Auth implements OnDestroy {
+export class Auth implements OnInit, OnDestroy {
   private http        = inject(HttpClient);
   private router      = inject(Router);
+  private route       = inject(ActivatedRoute);
   private authService = inject(AuthService);
   private api         = 'http://localhost:8000/api';
 
@@ -31,6 +32,14 @@ export class Auth implements OnDestroy {
   loading   = signal(false);
 
   private timerInterval: any = null;
+
+  allerAccueil() { this.router.navigate(['/']); }
+
+  ngOnInit() {
+    this.route.queryParams.subscribe(params => {
+      if (params['mode'] === 'login') this.step.set('login');
+    });
+  }
 
   goTo(s: Step) {
     this.erreur.set('');
@@ -210,6 +219,68 @@ export class Auth implements OnDestroy {
   maskPhone(p: string) {
     if (!p) return '';
     return p.slice(0, 5) + '****' + p.slice(-2);
+  }
+
+  // ── MOT DE PASSE OUBLIÉ ──
+  forgotEmail = signal('');
+  newPwd      = signal('');
+  newPwdConf  = signal('');
+
+  demanderReset(email: string) {
+    if (!email) { this.erreur.set('Saisissez votre email.'); return; }
+    this.loading.set(true);
+    this.erreur.set('');
+    this.forgotEmail.set(email);
+    this.email.set(email);
+
+    this.http.post<any>(`${this.api}/send-otp`, { email, canal: 'email' })
+      .subscribe({
+        next: () => {
+          this.loading.set(false);
+          this.goTo('forgot-otp');
+          this.startTimer();
+        },
+        error: (err) => {
+          this.loading.set(false);
+          this.erreur.set(err.error?.message || 'Email introuvable.');
+        }
+      });
+  }
+
+  verifierOtpReset() {
+    const code = this.getOtpCode();
+    if (code.length < 6) return;
+    // On garde le code OTP en mémoire et on passe à la saisie du mot de passe
+    // La vérification réelle se fait dans reset-password
+    clearInterval(this.timerInterval);
+    this.erreur.set('');
+    this.goTo('new-password');
+  }
+
+  reinitialiserPassword(pwd: string, pwdConf: string) {
+    if (!pwd || pwd !== pwdConf) {
+      this.erreur.set('Les mots de passe ne correspondent pas.');
+      return;
+    }
+    this.loading.set(true);
+    this.erreur.set('');
+
+    this.http.post<any>(`${this.api}/reset-password`, {
+      email                : this.forgotEmail(),
+      otp                  : this.getOtpCode(),
+      password             : pwd,
+      password_confirmation: pwdConf,
+    }).subscribe({
+      next: () => {
+        this.loading.set(false);
+        this.otpDigits.set(['', '', '', '', '', '']);
+        this.goTo('login');
+      },
+      error: (err) => {
+        this.loading.set(false);
+        this.erreur.set(err.error?.erreur || 'Code invalide ou expiré.');
+      }
+    });
   }
 
   ngOnDestroy() { clearInterval(this.timerInterval); }

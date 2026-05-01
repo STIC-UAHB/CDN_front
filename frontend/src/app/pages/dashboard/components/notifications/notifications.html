@@ -1,0 +1,51 @@
+<div class="section">
+  <div class="section-header">
+    <div>
+      <div class="section-title">Historique des notifications</div>
+      <div class="section-sub">Toutes les notifications envoyées par votre application.</div>
+    </div>
+  </div>
+
+  @if (loading()) {
+    <div class="empty-state">Chargement...</div>
+  } @else if (notifications().length === 0) {
+    <div class="empty-state">Aucune notification envoyée pour le moment.</div>
+  } @else {
+    <div class="notif-table-wrap">
+      <table class="notif-table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>User</th>
+            <th>Canal</th>
+            <th>Destinataire</th>
+            <th>Message</th>
+            <th>Statut</th>
+            <th>Date</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (n of notifications(); track n.id) {
+            <tr>
+              <td class="notif-id">#{{ n.id }}</td>
+              <td>{{ n.user_id }}</td>
+              <td><span class="canal-badge {{ n.canal }}">{{ n.canal }}</span></td>
+              <td class="notif-dest">{{ n.destinataire }}</td>
+              <td class="notif-msg">{{ n.message }}</td>
+              <td><span class="statut-badge {{ n.statut }}">{{ n.statut }}</span></td>
+              <td class="notif-date">{{ n.created_at | date:'dd/MM HH:mm' }}</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+    @if (lastPage() > 1) {
+      <div class="pagination">
+        <button class="btn-page" [disabled]="page() === 1" (click)="charger(page() - 1)">← Précédent</button>
+        <span class="page-info">Page {{ page() }} / {{ lastPage() }}</span>
+        <button class="btn-page" [disabled]="page() === lastPage()" (click)="charger(page() + 1)">Suivant →</button>
+      </div>
+    }
+  }
+</div>

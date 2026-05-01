@@ -1,0 +1,53 @@
+<div class="pricing-page">
+
+  <div class="pricing-header">
+    <button class="btn-back" (click)="retourDashboard()">← Retour</button>
+    <h1>Choisissez votre forfait</h1>
+    <p>Push et WebSocket inclus dans tous les forfaits. Le quota compte SMS + Email uniquement.</p>
+  </div>
+
+  @if (erreur()) {
+    <div class="alert-error">{{ erreur() }}</div>
+  }
+
+  <div class="plans-grid">
+    @for (plan of plans; track plan.id) {
+      <div class="plan-card" [class.popular]="plan.badge" [class.current]="planActuel() === plan.id">
+        @if (planActuel() === plan.id) {
+          <div class="plan-badge current-badge">✓ Votre forfait actuel</div>
+        } @else if (plan.badge) {
+          <div class="plan-badge">{{ plan.badge }}</div>
+        }
+        <div class="plan-color-bar" [style.background]="plan.color"></div>
+        <div class="plan-body">
+          <h2 class="plan-nom">{{ plan.nom }}</h2>
+          <p class="plan-desc">{{ plan.desc }}</p>
+          <div class="plan-prix">
+            <span class="prix-montant">{{ plan.prix | number }}</span>
+            <span class="prix-devise">FCFA / mois</span>
+          </div>
+          <ul class="plan-features">
+            <li>✓ {{ plan.quota | number }} notifications SMS/Email</li>
+            <li>✓ Push (FCM) illimité</li>
+            <li>✓ WebSocket (Reverb) illimité</li>
+            <li>✓ API key dédiée</li>
+          </ul>
+          @if (planActuel() === plan.id) {
+            <button class="btn-actuel" [style.borderColor]="plan.color" [style.color]="plan.color" disabled>
+              Forfait en cours
+            </button>
+          } @else {
+            <button
+              class="btn-payer"
+              [style.background]="plan.color"
+              [disabled]="loading() !== ''"
+              (click)="payer(plan.id)">
+              @if (loading() === plan.id) { Redirection... } @else { Payer avec Wave }
+            </button>
+          }
+        </div>
+      </div>
+    }
+  </div>
+
+</div>

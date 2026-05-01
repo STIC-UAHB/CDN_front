@@ -1,0 +1,87 @@
+<div class="settings-layout">
+
+  <!-- ── MENU GAUCHE ── -->
+  <div class="settings-nav">
+    <div class="settings-nav-title">Paramètres</div>
+    <a class="settings-nav-item" [class.active]="activeTab() === 'profil'" (click)="activeTab.set('profil')">
+      <span class="nav-icon">👤</span>
+      <div>
+        <div class="nav-label">Informations du compte</div>
+        <div class="nav-sub">Nom, email de contact</div>
+      </div>
+    </a>
+    <a class="settings-nav-item" [class.active]="activeTab() === 'password'" (click)="activeTab.set('password')">
+      <span class="nav-icon">🔒</span>
+      <div>
+        <div class="nav-label">Mot de passe</div>
+        <div class="nav-sub">Modifier votre mot de passe</div>
+      </div>
+    </a>
+  </div>
+
+  <!-- ── CONTENU DROITE ── -->
+  <div class="settings-content">
+
+    <!-- Profil -->
+    @if (activeTab() === 'profil') {
+      <div class="content-card">
+        <div class="content-title">Informations du compte</div>
+        <div class="content-sub">Modifiez le nom et l'email associés à votre application.</div>
+
+        @if (profilErreur()) { <div class="form-error">{{ profilErreur() }}</div> }
+        @if (profilSucces()) { <div class="form-success">{{ profilSucces() }}</div> }
+
+        <div class="form-group">
+          <label>Nom de l'application</label>
+          <input type="text" [value]="profilForm().nom"
+            (input)="setProfilField('nom', $any($event.target).value)">
+        </div>
+        <div class="form-group">
+          <label>Email de contact</label>
+          <input type="email" [value]="profilForm().email_contact"
+            (input)="setProfilField('email_contact', $any($event.target).value)">
+        </div>
+
+        <div class="form-footer">
+          <button class="btn-primary" [disabled]="profilLoading()" (click)="sauvegarderProfil()">
+            {{ profilLoading() ? 'Enregistrement...' : 'Enregistrer les modifications' }}
+          </button>
+        </div>
+      </div>
+    }
+
+    <!-- Mot de passe -->
+    @if (activeTab() === 'password') {
+      <div class="content-card">
+        <div class="content-title">Changer le mot de passe</div>
+        <div class="content-sub">Un email de confirmation vous sera envoyé après la modification.</div>
+
+        @if (pwErreur()) { <div class="form-error">{{ pwErreur() }}</div> }
+        @if (pwSucces()) { <div class="form-success">{{ pwSucces() }}</div> }
+
+        <div class="form-group">
+          <label>Mot de passe actuel</label>
+          <input type="password" [value]="pwForm().ancien_password"
+            (input)="setPwField('ancien_password', $any($event.target).value)">
+        </div>
+        <div class="form-group">
+          <label>Nouveau mot de passe</label>
+          <input type="password" [value]="pwForm().password"
+            (input)="setPwField('password', $any($event.target).value)">
+        </div>
+        <div class="form-group">
+          <label>Confirmer le nouveau mot de passe</label>
+          <input type="password" [value]="pwForm().password_confirmation"
+            (input)="setPwField('password_confirmation', $any($event.target).value)">
+        </div>
+
+        <div class="form-footer">
+          <button class="btn-primary" [disabled]="pwLoading()" (click)="changerPassword()">
+            {{ pwLoading() ? 'Modification...' : 'Changer le mot de passe' }}
+          </button>
+        </div>
+      </div>
+    }
+
+  </div>
+</div>
