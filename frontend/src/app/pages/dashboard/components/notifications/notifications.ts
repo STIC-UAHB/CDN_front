@@ -1,7 +1,6 @@
 import { Component, signal, OnInit, inject } from '@angular/core';
 import { DatePipe } from '@angular/common';
-import { HttpClient } from '@angular/common/http';
-import { AuthService } from '../../../../services/auth.service';
+import { ApiService } from '../../../../services/api.service';
 
 interface NotifItem {
   id: number;
@@ -23,22 +22,18 @@ interface NotifItem {
   styleUrl: './notifications.css',
 })
 export class NotificationsComponent implements OnInit {
-  private http        = inject(HttpClient);
-  private authService = inject(AuthService);
-  private api         = 'http://localhost:8000/api';
+  private apiService = inject(ApiService);
 
   notifications = signal<NotifItem[]>([]);
   page          = signal(1);
   lastPage      = signal(1);
   loading       = signal(false);
 
-  ngOnInit() {
-    this.charger();
-  }
+  ngOnInit() { this.charger(); }
 
   charger(page = 1) {
     this.loading.set(true);
-    this.http.get<any>(`${this.api}/notifications?page=${page}`, { headers: this.authService.authHeaders() })
+    this.apiService.getNotifications(page)
       .subscribe({
         next: (res) => {
           this.notifications.set(res.data);

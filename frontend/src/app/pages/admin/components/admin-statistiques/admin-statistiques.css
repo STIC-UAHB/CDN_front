@@ -1,0 +1,33 @@
+.stats-wrap { padding: 28px; display: flex; flex-direction: column; gap: 16px; }
+
+.charts-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+
+.chart-card {
+  background: #fff; border-radius: 12px;
+  padding: 20px; border: 1px solid #e2e8f0;
+}
+.chart-card.large { grid-column: span 1; }
+
+.card-title { font-size: 13px; font-weight: 600; color: #0f172a; margin-bottom: 16px; }
+
+/* Canal bars */
+.canal-list { display: flex; flex-direction: column; gap: 14px; }
+.canal-item {}
+.canal-header { display: flex; justify-content: space-between; margin-bottom: 6px; }
+.canal-nom   { font-size: 13px; font-weight: 500; color: #0f172a; text-transform: capitalize; }
+.canal-count { font-size: 12px; color: #64748b; }
+.canal-bar-bg { height: 8px; background: #f1f5f9; border-radius: 99px; overflow: hidden; }
+.canal-bar    { height: 100%; background: #4f46e5; border-radius: 99px; transition: width 0.4s; }
+
+/* Top clients */
+.client-row {
+  display: flex; align-items: center; gap: 12px;
+  padding: 8px 0; border-bottom: 1px solid #f1f5f9;
+}
+.client-row:last-child { border-bottom: none; }
+.client-rank  { font-size: 12px; font-weight: 700; color: #94a3b8; width: 28px; }
+.client-nom   { flex: 1; font-size: 13px; font-weight: 500; color: #0f172a; }
+.client-count { font-size: 12px; color: #64748b; }
+
+.loading { padding: 28px; color: #94a3b8; font-size: 13px; }
+.empty   { font-size: 13px; color: #94a3b8; padding: 12px 0; }

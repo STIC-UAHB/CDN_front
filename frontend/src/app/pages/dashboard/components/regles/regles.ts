@@ -1,6 +1,5 @@
 import { Component, signal, OnInit, inject } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { AuthService } from '../../../../services/auth.service';
+import { ApiService } from '../../../../services/api.service';
 
 interface Regle {
   id: number;
@@ -21,26 +20,22 @@ interface Regle {
   styleUrl: './regles.css',
 })
 export class ReglesComponent implements OnInit {
-  private http        = inject(HttpClient);
-  private authService = inject(AuthService);
-  private api         = 'http://localhost:8000/api';
+  private apiService = inject(ApiService);
 
-  regles        = signal<Regle[]>([]);
-  showForm      = signal(false);
-  loading       = signal(false);
-  erreur        = signal('');
-  succes        = signal('');
-  form          = signal({ event_code: '', message_template: '', description: '', sms_actif: false, email_actif: false, push_actif: false, socket_actif: false, non_desactivable: false });
+  regles   = signal<Regle[]>([]);
+  showForm = signal(false);
+  loading  = signal(false);
+  erreur   = signal('');
+  succes   = signal('');
+  form     = signal({ event_code: '', message_template: '', description: '', sms_actif: false, email_actif: false, push_actif: false, socket_actif: false, non_desactivable: false });
 
   templatePlaceholder = 'ex: Bonjour {nom}, votre quota est à {valeur}%';
   get btnLabel() { return this.loading() ? 'Enregistrement...' : 'Enregistrer'; }
 
-  ngOnInit() {
-    this.charger();
-  }
+  ngOnInit() { this.charger(); }
 
   charger() {
-    this.http.get<Regle[]>(`${this.api}/regles`, { headers: this.authService.authHeaders() })
+    this.apiService.getRegles()
       .subscribe({ next: (data) => this.regles.set(data), error: () => {} });
   }
 
@@ -58,7 +53,7 @@ export class ReglesComponent implements OnInit {
     this.erreur.set('');
     this.succes.set('');
 
-    this.http.post<Regle>(`${this.api}/regles`, f, { headers: this.authService.authHeaders() })
+    this.apiService.createRegle(f)
       .subscribe({
         next: (regle) => {
           this.regles.set([...this.regles(), regle]);
@@ -75,10 +70,7 @@ export class ReglesComponent implements OnInit {
   }
 
   telechargerTemplate() {
-    this.http.get(`${this.api}/regles/template`, {
-      headers: this.authService.authHeaders(),
-      responseType: 'blob'
-    }).subscribe(blob => {
+    this.apiService.getReglesTemplate().subscribe((blob: any) => {
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
@@ -96,7 +88,7 @@ export class ReglesComponent implements OnInit {
     reader.onload = (e) => {
       try {
         const data = JSON.parse(e.target?.result as string);
-        this.http.post<any>(`${this.api}/regles/import`, data, { headers: this.authService.authHeaders() })
+        this.apiService.importRegles(data)
           .subscribe({
             next: (res) => {
               this.succes.set(`${res.imported} règle(s) importée(s) avec succès.`);

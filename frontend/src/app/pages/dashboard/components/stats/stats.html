@@ -1,36 +1,99 @@
+<!-- ── 4 cartes fusionnées ── -->
 <div class="stats-grid">
-  <div class="stat-card">
-    <div class="stat-label">Notifications envoyées</div>
-    <div class="stat-value">{{ quotaUtilise() }}</div>
-    <div class="stat-sub">ce mois</div>
+
+  <div class="stat-card quota-card">
+    <div class="stat-label">Quota mensuel</div>
+    <div class="quota-numbers">
+      <span class="quota-used">{{ quotaUtilise() }}</span>
+      <span class="quota-sep">/</span>
+      <span class="quota-total">{{ quotaMensuel() }}</span>
+    </div>
+    <div class="quota-bar-bg">
+      <div class="quota-bar" [style.width.%]="quotaPct()"></div>
+    </div>
+    <div class="stat-sub">{{ quotaPct() }}% utilisé — {{ quotaMensuel() - quotaUtilise() }} restantes</div>
   </div>
-  <div class="stat-card">
-    <div class="stat-label">Quota restant</div>
-    <div class="stat-value">{{ quotaMensuel() - quotaUtilise() }}</div>
-    <div class="stat-sub">notifications disponibles</div>
-  </div>
-  <div class="stat-card">
-    <div class="stat-label">Taux d'utilisation</div>
-    <div class="stat-value">{{ quotaPct() }}%</div>
-    <div class="stat-sub">du quota mensuel</div>
-  </div>
-  <div class="stat-card green">
-    <div class="stat-label">Statut du compte</div>
-    <div class="stat-value">✓ Actif</div>
-    <div class="stat-sub">compte vérifié</div>
-  </div>
+
+  @if (statsData()) {
+    <div class="stat-card kpi-success">
+      <div class="stat-label">Réussies</div>
+      <div class="stat-value">{{ statsData().succes }}</div>
+      <div class="stat-sub">{{ statsData().taux_succes }}% de taux de succès</div>
+    </div>
+    <div class="stat-card kpi-warning">
+      <div class="stat-label">En attente</div>
+      <div class="stat-value">{{ statsData().en_attente }}</div>
+      <div class="stat-sub">en cours de traitement</div>
+    </div>
+    <div class="stat-card kpi-danger">
+      <div class="stat-label">Échouées</div>
+      <div class="stat-value">{{ statsData().echecs }}</div>
+      <div class="stat-sub">erreurs de livraison</div>
+    </div>
+  } @else {
+    <div class="stat-card skeleton"></div>
+    <div class="stat-card skeleton"></div>
+    <div class="stat-card skeleton"></div>
+  }
+
 </div>
 
+<!-- ── Graphique + canaux ── -->
+@if (statsData()) {
+  <div class="analytics-section">
+
+    <div class="charts-row">
+      <div class="chart-card">
+        <div class="chart-title">Activité des 30 derniers jours</div>
+        <canvas #chartCanvas></canvas>
+      </div>
+
+      <div class="chart-card">
+        <div class="chart-title">Répartition par canal</div>
+        <div class="canal-list">
+          @for (item of canalEntries; track item.key) {
+            <div class="canal-item">
+              <div class="canal-header">
+                <span class="canal-nom">{{ item.key }}</span>
+                <span class="canal-count">{{ item.value }} ({{ canalPct(item.value) }}%)</span>
+              </div>
+              <div class="canal-bar-bg">
+                <div class="canal-bar" [style.width.%]="canalPct(item.value)"></div>
+              </div>
+            </div>
+          }
+          @if (canalEntries.length === 0) {
+            <div class="canal-empty">Aucune donnée</div>
+          }
+        </div>
+      </div>
+    </div>
+
+    @if (statsData().top_regles.length > 0) {
+      <div class="chart-card top-regles">
+        <div class="chart-title">Top règles <span class="chart-sub">— notifications liées à une règle uniquement</span></div>
+        @for (r of statsData().top_regles; track r.nom; let i = $index) {
+          <div class="regle-row">
+            <span class="regle-rank">#{{ i + 1 }}</span>
+            <span class="regle-nom">{{ r.nom }}</span>
+            <span class="regle-count">{{ r.total | number }} envois</span>
+          </div>
+        }
+      </div>
+    }
+
+  </div>
+}
+
+<!-- ── Infos compte ── -->
 <div class="info-section">
   <div class="info-col">
     <div class="info-card">
       <div class="info-card-title">▾ Informations du compte</div>
-
       <div class="info-row">
         <div class="info-field-label">Nom de l'application</div>
         <div class="info-field-val">{{ nom() }}</div>
       </div>
-
       <div class="info-row">
         <div class="info-field-label">API Key</div>
         <div class="key-wrap">
@@ -44,7 +107,6 @@
         </div>
         <div class="key-warn">⚠ Gardez cette clé secrète. Ne la partagez jamais publiquement.</div>
       </div>
-
       <div class="info-row">
         <div class="info-field-label">Quota mensuel</div>
         <div class="info-field-val">{{ quotaMensuel() | number }} notifications/mois</div>

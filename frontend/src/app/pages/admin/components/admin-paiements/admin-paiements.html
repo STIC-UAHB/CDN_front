@@ -1,0 +1,31 @@
+<div class="paie-wrap">
+  <div class="section-title">Paiements <span class="badge">{{ paiements().length }}</span></div>
+
+  <table class="paie-table">
+    <thead>
+      <tr>
+        <th>Client</th>
+        <th>Email</th>
+        <th>Plan</th>
+        <th>Montant</th>
+        <th>Statut</th>
+        <th>Date</th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (p of paiements(); track p.id) {
+        <tr>
+          <td class="td-nom">{{ p.client_nom }}</td>
+          <td class="td-email">{{ p.client_email }}</td>
+          <td><span class="plan-badge" [class]="'plan-' + p.plan">{{ p.plan }}</span></td>
+          <td class="td-montant">{{ p.montant | number }} FCFA</td>
+          <td><span class="statut-badge" [class]="'ps-' + p.statut">{{ p.statut }}</span></td>
+          <td class="td-date">{{ p.created_at | date:'dd/MM/yyyy HH:mm' }}</td>
+        </tr>
+      }
+      @if (paiements().length === 0) {
+        <tr><td colspan="6" class="empty-row">Aucun paiement</td></tr>
+      }
+    </tbody>
+  </table>
+</div>

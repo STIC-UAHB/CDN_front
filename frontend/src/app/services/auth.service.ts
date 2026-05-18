@@ -11,6 +11,7 @@ export class AuthService {
   private QUOTA_U    = 'quota_utilise';
   private PLAN_KEY   = 'plan';
   private SUB_STATUT = 'subscription_statut';
+  private IS_ADMIN   = 'is_admin';
 
   setSession(res: any) {
     localStorage.setItem(this.TOKEN_KEY,  res.token);
@@ -20,6 +21,7 @@ export class AuthService {
     localStorage.setItem(this.QUOTA_U,    res.quota_utilise);
     localStorage.setItem(this.PLAN_KEY,   res.plan ?? '');
     localStorage.setItem(this.SUB_STATUT, res.subscription_statut ?? 'inactive');
+    localStorage.setItem(this.IS_ADMIN,   res.is_admin ? '1' : '0');
   }
 
   getToken(): string | null {
@@ -45,6 +47,10 @@ export class AuthService {
   getPlan(): string { return localStorage.getItem(this.PLAN_KEY) || ''; }
   getSubscriptionStatut(): string { return localStorage.getItem(this.SUB_STATUT) || 'inactive'; }
 
+  isAdmin(): boolean {
+    return localStorage.getItem(this.IS_ADMIN) === '1';
+  }
+
   isLoggedIn(): boolean {
     return !!this.getToken();
   }
@@ -63,6 +69,14 @@ export class AuthService {
       'Authorization': `Bearer ${this.getApiKey()}`,
       'Content-Type':  'application/json',
     });
+  }
+
+  updateSubscription(res: any) {
+    localStorage.setItem(this.NOM_KEY,    res.nom          ?? this.getNom());
+    localStorage.setItem(this.QUOTA_M,    res.quota_mensuel ?? this.getQuotaMensuel());
+    localStorage.setItem(this.QUOTA_U,    res.quota_utilise ?? this.getQuotaUtilise());
+    localStorage.setItem(this.PLAN_KEY,   res.plan          ?? this.getPlan());
+    localStorage.setItem(this.SUB_STATUT, res.subscription_statut ?? this.getSubscriptionStatut());
   }
 
   logout() {

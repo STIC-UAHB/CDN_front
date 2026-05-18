@@ -5,7 +5,9 @@ import { Dashboard } from './pages/dashboard/dashboard';
 import { Pricing } from './pages/pricing/pricing';
 import { PaymentSuccess } from './pages/payment-success/payment-success';
 import { PaymentError } from './pages/payment-error/payment-error';
+import { AdminDashboard } from './pages/admin/admin';
 import { authGuard } from './guards/auth.guard';
+import { adminGuard } from './guards/admin.guard';
 
 export const routes: Routes = [
   { path: '',                component: Accueil },
@@ -14,4 +16,5 @@ export const routes: Routes = [
   { path: 'pricing',         component: Pricing,         canActivate: [authGuard] },
   { path: 'payment/success', component: PaymentSuccess,  canActivate: [authGuard] },
   { path: 'payment/error',   component: PaymentError,    canActivate: [authGuard] },
+  { path: 'admin',           component: AdminDashboard,  canActivate: [authGuard, adminGuard] },
 ];

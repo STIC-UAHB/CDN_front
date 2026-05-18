@@ -1,7 +1,7 @@
 import { Component, signal, OnDestroy, OnInit, inject } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
 import { Router, ActivatedRoute } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
+import { ApiService } from '../../services/api.service';
 
 type Step = 'register' | 'login' | 'canal' | 'otp' | 'forgot' | 'forgot-otp' | 'new-password';
 
@@ -12,11 +12,10 @@ type Step = 'register' | 'login' | 'canal' | 'otp' | 'forgot' | 'forgot-otp' | '
   styleUrl: './auth.css',
 })
 export class Auth implements OnInit, OnDestroy {
-  private http        = inject(HttpClient);
   private router      = inject(Router);
   private route       = inject(ActivatedRoute);
   private authService = inject(AuthService);
-  private api         = 'http://localhost:8000/api';
+  private api         = inject(ApiService);
 
   step         = signal<Step>('register');
   showRegPwd   = signal(false);
@@ -60,24 +59,19 @@ export class Auth implements OnInit, OnDestroy {
     this.loading.set(true);
     this.erreur.set('');
 
-    this.http.post<any>(`${this.api}/register`, {
-      nom,
-      email_contact          : email,
-      telephone              : tel,
-      password               : pwd,
-      password_confirmation  : pwdConf,
-    }).subscribe({
-      next: (res) => {
-        this.email.set(res.email);
-        this.telephone.set(res.telephone);
-        this.loading.set(false);
-        this.goTo('canal');
-      },
-      error: (err) => {
-        this.loading.set(false);
-        this.erreur.set(err.error?.message || 'Erreur lors de l\'inscription.');
-      }
-    });
+    this.api.register({ nom, email_contact: email, telephone: tel, password: pwd, password_confirmation: pwdConf })
+      .subscribe({
+        next: (res) => {
+          this.email.set(res.email);
+          this.telephone.set(res.telephone);
+          this.loading.set(false);
+          this.goTo('canal');
+        },
+        error: (err) => {
+          this.loading.set(false);
+          this.erreur.set(err.error?.message || 'Erreur lors de l\'inscription.');
+        }
+      });
   }
 
   // ── ÉTAPE 2 — Envoyer OTP ──
@@ -86,39 +80,35 @@ export class Auth implements OnInit, OnDestroy {
     this.loading.set(true);
     this.erreur.set('');
 
-    this.http.post<any>(`${this.api}/send-otp`, {
-      email: this.email(),
-      canal: c,
-    }).subscribe({
-      next: () => {
-        this.loading.set(false);
-        this.goTo('otp');
-        this.startTimer();
-      },
-      error: (err) => {
-        this.loading.set(false);
-        this.erreur.set(err.error?.message || 'Erreur lors de l\'envoi du code.');
-      }
-    });
+    this.api.sendOtp({ email: this.email(), canal: c })
+      .subscribe({
+        next: () => {
+          this.loading.set(false);
+          this.goTo('otp');
+          this.startTimer();
+        },
+        error: (err) => {
+          this.loading.set(false);
+          this.erreur.set(err.error?.message || 'Erreur lors de l\'envoi du code.');
+        }
+      });
   }
 
-  // ── Renvoyer OTP (même canal ou autre) ──
+  // ── Renvoyer OTP ──
   renvoyerOtp(c: 'email' | 'sms') {
     this.canal.set(c);
     this.erreur.set('');
 
-    this.http.post<any>(`${this.api}/send-otp`, {
-      email: this.email(),
-      canal: c,
-    }).subscribe({
-      next: () => {
-        this.otpDigits.set(['', '', '', '', '', '']);
-        this.resetTimer();
-      },
-      error: (err) => {
-        this.erreur.set(err.error?.message || 'Erreur lors du renvoi.');
-      }
-    });
+    this.api.sendOtp({ email: this.email(), canal: c })
+      .subscribe({
+        next: () => {
+          this.otpDigits.set(['', '', '', '', '', '']);
+          this.resetTimer();
+        },
+        error: (err) => {
+          this.erreur.set(err.error?.message || 'Erreur lors du renvoi.');
+        }
+      });
   }
 
   // ── ÉTAPE 3 — Vérifier OTP ──
@@ -129,20 +119,18 @@ export class Auth implements OnInit, OnDestroy {
     this.loading.set(true);
     this.erreur.set('');
 
-    this.http.post<any>(`${this.api}/verify-otp`, {
-      email: this.email(),
-      otp  : code,
-    }).subscribe({
-      next: () => {
-        clearInterval(this.timerInterval);
-        this.loading.set(false);
-        this.goTo('login');
-      },
-      error: (err) => {
-        this.loading.set(false);
-        this.erreur.set(err.error?.erreur || 'Code incorrect ou expiré.');
-      }
-    });
+    this.api.verifyOtp({ email: this.email(), otp: code })
+      .subscribe({
+        next: () => {
+          clearInterval(this.timerInterval);
+          this.loading.set(false);
+          this.goTo('login');
+        },
+        error: (err) => {
+          this.loading.set(false);
+          this.erreur.set(err.error?.erreur || 'Code incorrect ou expiré.');
+        }
+      });
   }
 
   // ── CONNEXION ──
@@ -150,18 +138,80 @@ export class Auth implements OnInit, OnDestroy {
     this.loading.set(true);
     this.erreur.set('');
 
-    this.http.post<any>(`${this.api}/login`, {
-      email_contact: email,
-      password     : pwd,
+    this.api.login({ email_contact: email, password: pwd })
+      .subscribe({
+        next: (res) => {
+          this.loading.set(false);
+          this.authService.setSession(res);
+          if (this.authService.isAdmin()) {
+            this.router.navigate(['/admin']);
+          } else {
+            this.router.navigate(['/dashboard']);
+          }
+        },
+        error: (err) => {
+          this.loading.set(false);
+          this.erreur.set(err.error?.erreur || 'Identifiants incorrects.');
+        }
+      });
+  }
+
+  // ── MOT DE PASSE OUBLIÉ ──
+  forgotEmail = signal('');
+  newPwd      = signal('');
+  newPwdConf  = signal('');
+
+  demanderReset(email: string) {
+    if (!email) { this.erreur.set('Saisissez votre email.'); return; }
+    this.loading.set(true);
+    this.erreur.set('');
+    this.forgotEmail.set(email);
+    this.email.set(email);
+
+    this.api.sendOtp({ email, canal: 'email' })
+      .subscribe({
+        next: () => {
+          this.loading.set(false);
+          this.goTo('forgot-otp');
+          this.startTimer();
+        },
+        error: (err) => {
+          this.loading.set(false);
+          this.erreur.set(err.error?.message || 'Email introuvable.');
+        }
+      });
+  }
+
+  verifierOtpReset() {
+    const code = this.getOtpCode();
+    if (code.length < 6) return;
+    clearInterval(this.timerInterval);
+    this.erreur.set('');
+    this.goTo('new-password');
+  }
+
+  reinitialiserPassword(pwd: string, pwdConf: string) {
+    if (!pwd || pwd !== pwdConf) {
+      this.erreur.set('Les mots de passe ne correspondent pas.');
+      return;
+    }
+    this.loading.set(true);
+    this.erreur.set('');
+
+    this.api.resetPassword({
+      email                : this.forgotEmail(),
+      otp                  : this.getOtpCode(),
+      password             : pwd,
+      password_confirmation: pwdConf,
     }).subscribe({
-      next: (res) => {
+      next: () => {
         this.loading.set(false);
-        this.authService.setSession(res);
-        this.router.navigate(['/dashboard']);
+        this.otpDigits.set(['', '', '', '', '', '']);
+        this.goTo('login');
       },
       error: (err) => {
         this.loading.set(false);
-        this.erreur.set(err.error?.erreur || 'Identifiants incorrects.');
+        this.erreur.set(err.error?.erreur || 'Code invalide ou expiré.');
       }
     });
   }
@@ -219,68 +269,6 @@ export class Auth implements OnInit, OnDestroy {
   maskPhone(p: string) {
     if (!p) return '';
     return p.slice(0, 5) + '****' + p.slice(-2);
-  }
-
-  // ── MOT DE PASSE OUBLIÉ ──
-  forgotEmail = signal('');
-  newPwd      = signal('');
-  newPwdConf  = signal('');
-
-  demanderReset(email: string) {
-    if (!email) { this.erreur.set('Saisissez votre email.'); return; }
-    this.loading.set(true);
-    this.erreur.set('');
-    this.forgotEmail.set(email);
-    this.email.set(email);
-
-    this.http.post<any>(`${this.api}/send-otp`, { email, canal: 'email' })
-      .subscribe({
-        next: () => {
-          this.loading.set(false);
-          this.goTo('forgot-otp');
-          this.startTimer();
-        },
-        error: (err) => {
-          this.loading.set(false);
-          this.erreur.set(err.error?.message || 'Email introuvable.');
-        }
-      });
-  }
-
-  verifierOtpReset() {
-    const code = this.getOtpCode();
-    if (code.length < 6) return;
-    // On garde le code OTP en mémoire et on passe à la saisie du mot de passe
-    // La vérification réelle se fait dans reset-password
-    clearInterval(this.timerInterval);
-    this.erreur.set('');
-    this.goTo('new-password');
-  }
-
-  reinitialiserPassword(pwd: string, pwdConf: string) {
-    if (!pwd || pwd !== pwdConf) {
-      this.erreur.set('Les mots de passe ne correspondent pas.');
-      return;
-    }
-    this.loading.set(true);
-    this.erreur.set('');
-
-    this.http.post<any>(`${this.api}/reset-password`, {
-      email                : this.forgotEmail(),
-      otp                  : this.getOtpCode(),
-      password             : pwd,
-      password_confirmation: pwdConf,
-    }).subscribe({
-      next: () => {
-        this.loading.set(false);
-        this.otpDigits.set(['', '', '', '', '', '']);
-        this.goTo('login');
-      },
-      error: (err) => {
-        this.loading.set(false);
-        this.erreur.set(err.error?.erreur || 'Code invalide ou expiré.');
-      }
-    });
   }
 
   ngOnDestroy() { clearInterval(this.timerInterval); }

@@ -1,6 +1,5 @@
 import { Component, input, output, signal, inject, OnInit } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { AuthService } from '../../../../services/auth.service';
+import { ApiService } from '../../../../services/api.service';
 
 @Component({
   selector: 'app-settings',
@@ -14,19 +13,15 @@ export class SettingsComponent implements OnInit {
 
   nomUpdated = output<string>();
 
-  private http        = inject(HttpClient);
-  private authService = inject(AuthService);
-  private api         = 'http://localhost:8000/api';
+  private apiService = inject(ApiService);
 
   activeTab = signal('profil');
 
-  // Formulaire profil
   profilForm    = signal({ nom: '', email_contact: '' });
   profilLoading = signal(false);
   profilErreur  = signal('');
   profilSucces  = signal('');
 
-  // Formulaire mot de passe
   pwForm    = signal({ ancien_password: '', password: '', password_confirmation: '' });
   pwLoading = signal(false);
   pwErreur  = signal('');
@@ -49,7 +44,7 @@ export class SettingsComponent implements OnInit {
     this.profilErreur.set('');
     this.profilSucces.set('');
 
-    this.http.put<any>(`${this.api}/me/profil`, this.profilForm(), { headers: this.authService.authHeaders() })
+    this.apiService.updateProfil(this.profilForm())
       .subscribe({
         next: (res) => {
           this.profilSucces.set('Profil mis à jour avec succès.');
@@ -73,7 +68,7 @@ export class SettingsComponent implements OnInit {
     this.pwErreur.set('');
     this.pwSucces.set('');
 
-    this.http.put<any>(`${this.api}/me/password`, f, { headers: this.authService.authHeaders() })
+    this.apiService.updatePassword(f)
       .subscribe({
         next: (res) => {
           this.pwSucces.set(res.message);

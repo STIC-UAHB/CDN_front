@@ -1,0 +1,49 @@
+<div class="regles-wrap">
+  <div class="regles-header">
+    <div class="section-title">Règles <span class="badge">{{ reglesFiltrees().length }}</span></div>
+    <div class="filters">
+      <input class="search-input" type="text" placeholder="Rechercher event_code…"
+        [value]="recherche()" (input)="recherche.set($any($event.target).value)">
+      <select class="filter-select" [value]="filtreClient()"
+        (change)="filtreClient.set($any($event.target).value)">
+        <option value="">Tous les clients</option>
+        @for (c of clients(); track c.id) {
+          <option [value]="c.id">{{ c.nom }}</option>
+        }
+      </select>
+    </div>
+  </div>
+
+  <table class="regles-table">
+    <thead>
+      <tr>
+        <th>Client</th>
+        <th>event_code</th>
+        <th>Canaux actifs</th>
+        <th>Statut</th>
+        <th>Non désactivable</th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (r of reglesFiltrees(); track r.id) {
+        <tr>
+          <td class="td-nom">{{ r.client?.nom ?? '?' }}</td>
+          <td class="td-code">{{ r.event_code }}</td>
+          <td class="td-canaux">{{ canaux(r) }}</td>
+          <td>
+            <span class="statut-badge" [class]="r.actif ? 'st-green' : 'st-grey'">
+              {{ r.actif ? 'Actif' : 'Inactif' }}
+            </span>
+          </td>
+          <td>
+            @if (r.non_desactivable) { <span class="lock-badge">Verrouillé</span> }
+            @else { <span class="td-grey">—</span> }
+          </td>
+        </tr>
+      }
+      @if (reglesFiltrees().length === 0) {
+        <tr><td colspan="5" class="empty-row">Aucune règle trouvée</td></tr>
+      }
+    </tbody>
+  </table>
+</div>

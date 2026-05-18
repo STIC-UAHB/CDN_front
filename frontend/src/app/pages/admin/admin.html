@@ -1,0 +1,56 @@
+<div class="admin-layout">
+
+  <aside class="admin-sidebar">
+    <div class="admin-brand">
+      <span class="brand-name">BabelNotif</span>
+      <span class="brand-tag">Admin</span>
+    </div>
+
+    <nav class="admin-nav">
+      <button class="nav-item" [class.active]="activeMenu() === 'stats'" (click)="activeMenu.set('stats')">
+        <span class="nav-icon">▣</span> Vue d'ensemble
+      </button>
+      <button class="nav-item" [class.active]="activeMenu() === 'clients'" (click)="activeMenu.set('clients')">
+        <span class="nav-icon">◉</span> Clients
+      </button>
+      <button class="nav-item" [class.active]="activeMenu() === 'paiements'" (click)="activeMenu.set('paiements')">
+        <span class="nav-icon">◈</span> Paiements
+      </button>
+      <div class="nav-separator"></div>
+      <button class="nav-item" [class.active]="activeMenu() === 'notifications'" (click)="activeMenu.set('notifications')">
+        <span class="nav-icon">◎</span> Notifications
+      </button>
+      <button class="nav-item" [class.active]="activeMenu() === 'regles'" (click)="activeMenu.set('regles')">
+        <span class="nav-icon">◇</span> Règles
+      </button>
+      <button class="nav-item" [class.active]="activeMenu() === 'statistiques'" (click)="activeMenu.set('statistiques')">
+        <span class="nav-icon">◫</span> Statistiques
+      </button>
+    </nav>
+
+    <button class="logout-btn" (click)="logout()">Déconnexion</button>
+  </aside>
+
+  <main class="admin-main">
+    <div class="admin-topbar">
+      <h1 class="page-title">
+        @if (activeMenu() === 'stats')          { Vue d'ensemble }
+        @if (activeMenu() === 'clients')        { Gestion des clients }
+        @if (activeMenu() === 'paiements')      { Historique des paiements }
+        @if (activeMenu() === 'notifications')  { Logs notifications }
+        @if (activeMenu() === 'regles')         { Règles }
+        @if (activeMenu() === 'statistiques')   { Statistiques globales }
+      </h1>
+    </div>
+
+    <div class="admin-content">
+      @if (activeMenu() === 'stats')          { <app-admin-stats /> }
+      @if (activeMenu() === 'clients')        { <app-admin-clients /> }
+      @if (activeMenu() === 'paiements')      { <app-admin-paiements /> }
+      @if (activeMenu() === 'notifications')  { <app-admin-notifications /> }
+      @if (activeMenu() === 'regles')         { <app-admin-regles /> }
+      @if (activeMenu() === 'statistiques')   { <app-admin-statistiques /> }
+    </div>
+  </main>
+
+</div>

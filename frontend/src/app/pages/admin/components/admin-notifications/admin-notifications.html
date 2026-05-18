@@ -1,0 +1,59 @@
+<div class="notif-wrap">
+  <div class="notif-header">
+    <div class="section-title">
+      Notifications
+      @if (meta()) { <span class="badge">{{ meta().total }}</span> }
+    </div>
+    <div class="filters">
+      <select class="filter-select" [value]="filtreCanal()"
+        (change)="filtreCanal.set($any($event.target).value); appliquerFiltres()">
+        <option value="">Tous les canaux</option>
+        <option value="email">Email</option>
+        <option value="sms">SMS</option>
+        <option value="push">Push</option>
+        <option value="socket">Socket</option>
+      </select>
+      <select class="filter-select" [value]="filtreStatut()"
+        (change)="filtreStatut.set($any($event.target).value); appliquerFiltres()">
+        <option value="">Tous les statuts</option>
+        <option value="envoye">Envoyé</option>
+        <option value="echoue">Échoué</option>
+        <option value="en_attente">En attente</option>
+      </select>
+    </div>
+  </div>
+
+  <table class="notif-table">
+    <thead>
+      <tr>
+        <th>Client</th>
+        <th>Canal</th>
+        <th>Destinataire</th>
+        <th>Statut</th>
+        <th>Date</th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (n of notifications(); track n.id) {
+        <tr>
+          <td class="td-nom">{{ n.client?.nom ?? '?' }}</td>
+          <td><span class="canal-badge canal-{{ n.canal }}">{{ n.canal }}</span></td>
+          <td class="td-dest">{{ n.destinataire }}</td>
+          <td><span class="statut-badge" [class]="statutClass(n.statut)">{{ n.statut }}</span></td>
+          <td class="td-date">{{ n.created_at | date:'dd/MM/yyyy HH:mm' }}</td>
+        </tr>
+      }
+      @if (notifications().length === 0) {
+        <tr><td colspan="5" class="empty-row">Aucune notification</td></tr>
+      }
+    </tbody>
+  </table>
+
+  @if (meta() && meta().last_page > 1) {
+    <div class="pagination">
+      <button class="page-btn" [disabled]="page() === 1" (click)="pagePrecedente()">← Précédent</button>
+      <span class="page-info">Page {{ meta().current_page }} / {{ meta().last_page }}</span>
+      <button class="page-btn" [disabled]="page() === meta().last_page" (click)="pageSuivante()">Suivant →</button>
+    </div>
+  }
+</div>

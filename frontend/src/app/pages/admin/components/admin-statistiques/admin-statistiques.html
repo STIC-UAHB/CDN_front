@@ -1,0 +1,55 @@
+@if (!data()) {
+  <div class="loading">Chargement des statistiques…</div>
+}
+
+@if (data()) {
+  <div class="stats-wrap">
+
+    <!-- Ligne 1 : graphique par jour + donut statut -->
+    <div class="charts-row">
+      <div class="chart-card large">
+        <div class="card-title">Notifications — 30 derniers jours</div>
+        <canvas #jourCanvas></canvas>
+      </div>
+      <div class="chart-card">
+        <div class="card-title">Répartition par statut</div>
+        <canvas #statutCanvas></canvas>
+      </div>
+    </div>
+
+    <!-- Ligne 2 : canaux + top clients -->
+    <div class="charts-row">
+      <div class="chart-card">
+        <div class="card-title">Répartition par canal</div>
+        <div class="canal-list">
+          @for (item of canalEntries; track item.key) {
+            <div class="canal-item">
+              <div class="canal-header">
+                <span class="canal-nom">{{ item.key }}</span>
+                <span class="canal-count">{{ item.value }} ({{ canalPct(item.value) }}%)</span>
+              </div>
+              <div class="canal-bar-bg">
+                <div class="canal-bar" [style.width.%]="canalPct(item.value)"></div>
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+
+      <div class="chart-card large">
+        <div class="card-title">Top 10 clients — volume de notifications</div>
+        @for (c of data().par_client; track c.nom; let i = $index) {
+          <div class="client-row">
+            <span class="client-rank">#{{ i + 1 }}</span>
+            <span class="client-nom">{{ c.nom }}</span>
+            <span class="client-count">{{ c.total | number }} notifs</span>
+          </div>
+        }
+        @if (data().par_client.length === 0) {
+          <div class="empty">Aucune donnée</div>
+        }
+      </div>
+    </div>
+
+  </div>
+}

@@ -1,0 +1,88 @@
+<div class="clients-wrap">
+  <div class="clients-header">
+    <div class="section-title">Clients <span class="badge">{{ clientsFiltres().length }}</span></div>
+    <div class="filters">
+      <input class="search-input" type="text" placeholder="Rechercher nom ou email…"
+        [value]="recherche()" (input)="recherche.set($any($event.target).value)">
+      <select class="filter-select" [value]="filtreStatut()" (change)="filtreStatut.set($any($event.target).value)">
+        <option value="">Tous les statuts</option>
+        <option value="actif">Actif</option>
+        <option value="bloque">Bloqué</option>
+      </select>
+      <select class="filter-select" [value]="filtrePlan()" (change)="filtrePlan.set($any($event.target).value)">
+        <option value="">Tous les plans</option>
+        @for (p of plans(); track p) {
+          <option [value]="p">{{ p }}</option>
+        }
+      </select>
+    </div>
+  </div>
+
+  <table class="clients-table">
+    <thead>
+      <tr>
+        <th>Nom</th>
+        <th>Email</th>
+        <th>Plan</th>
+        <th>Quota utilisé</th>
+        <th>Statut</th>
+        <th>Abonnement</th>
+        <th>Inscription</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (c of clientsFiltres(); track c.id) {
+        <tr>
+          <td class="td-nom">{{ c.nom }}</td>
+          <td class="td-email">{{ c.email_contact }}</td>
+          <td><span class="plan-badge" [class]="'plan-' + (c.plan || 'none')">{{ c.plan || '—' }}</span></td>
+          <td>{{ c.quota_utilise }} / {{ c.quota_mensuel }}</td>
+          <td><span class="statut-badge" [class]="'s-' + c.statut">{{ c.statut }}</span></td>
+          <td><span class="statut-badge" [class]="'s-' + c.subscription_statut">{{ c.subscription_statut }}</span></td>
+          <td class="td-date">{{ c.created_at | date:'dd/MM/yyyy' }}</td>
+          <td><button class="edit-btn" (click)="ouvrir(c)">Modifier</button></td>
+        </tr>
+      }
+      @if (clientsFiltres().length === 0) {
+        <tr><td colspan="8" class="empty-row">Aucun client trouvé</td></tr>
+      }
+    </tbody>
+  </table>
+</div>
+
+@if (editId() !== null && editClient()) {
+  <div class="modal-overlay" (click)="fermer()">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <div class="modal-title">{{ editClient().nom }}</div>
+      <div class="modal-email">{{ editClient().email_contact }}</div>
+
+      <div class="modal-field">
+        <label>Clé API</label>
+        <div class="key-wrap">
+          <input class="key-input" [type]="showApiKey() ? 'text' : 'password'" [value]="editClient().api_key" readonly>
+          <button class="key-btn" (click)="showApiKey.set(!showApiKey())">{{ showApiKey() ? '🙈' : '👁' }}</button>
+        </div>
+      </div>
+
+      <div class="modal-field">
+        <label>Quota mensuel</label>
+        <input type="number" [value]="editQuota()" (input)="editQuota.set(+$any($event.target).value)" min="0">
+      </div>
+
+      <div class="modal-field">
+        <label>Statut</label>
+        <select [value]="editStatut()" (change)="editStatut.set($any($event.target).value)">
+          <option value="actif">Actif</option>
+          <option value="bloque">Bloqué</option>
+        </select>
+      </div>
+
+      @if (message()) { <div class="modal-ok">{{ message() }}</div> }
+      <div class="modal-actions">
+        <button class="btn-cancel" (click)="fermer()">Annuler</button>
+        <button class="btn-save" (click)="sauvegarder()">Enregistrer</button>
+      </div>
+    </div>
+  </div>
+}
