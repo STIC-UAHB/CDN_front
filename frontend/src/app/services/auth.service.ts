@@ -14,41 +14,41 @@ export class AuthService {
   private IS_ADMIN   = 'is_admin';
 
   setSession(res: any) {
-    localStorage.setItem(this.TOKEN_KEY,  res.token);
-    localStorage.setItem(this.API_KEY,    res.api_key);
-    localStorage.setItem(this.NOM_KEY,    res.nom);
-    localStorage.setItem(this.QUOTA_M,    res.quota_mensuel);
-    localStorage.setItem(this.QUOTA_U,    res.quota_utilise);
-    localStorage.setItem(this.PLAN_KEY,   res.plan ?? '');
-    localStorage.setItem(this.SUB_STATUT, res.subscription_statut ?? 'inactive');
-    localStorage.setItem(this.IS_ADMIN,   res.is_admin ? '1' : '0');
+    sessionStorage.setItem(this.TOKEN_KEY,  res.token);
+    sessionStorage.setItem(this.API_KEY,    res.api_key);
+    sessionStorage.setItem(this.NOM_KEY,    res.nom);
+    sessionStorage.setItem(this.QUOTA_M,    res.quota_mensuel);
+    sessionStorage.setItem(this.QUOTA_U,    res.quota_utilise);
+    sessionStorage.setItem(this.PLAN_KEY,   res.plan ?? '');
+    sessionStorage.setItem(this.SUB_STATUT, res.subscription_statut ?? 'inactive');
+    sessionStorage.setItem(this.IS_ADMIN,   res.is_admin ? '1' : '0');
   }
 
   getToken(): string | null {
-    return localStorage.getItem(this.TOKEN_KEY);
+    return sessionStorage.getItem(this.TOKEN_KEY);
   }
 
   getApiKey(): string | null {
-    return localStorage.getItem(this.API_KEY);
+    return sessionStorage.getItem(this.API_KEY);
   }
 
   getNom(): string {
-    return localStorage.getItem(this.NOM_KEY) || '';
+    return sessionStorage.getItem(this.NOM_KEY) || '';
   }
 
   getQuotaMensuel(): number {
-    return Number(localStorage.getItem(this.QUOTA_M) || 0);
+    return Number(sessionStorage.getItem(this.QUOTA_M) || 0);
   }
 
   getQuotaUtilise(): number {
-    return Number(localStorage.getItem(this.QUOTA_U) || 0);
+    return Number(sessionStorage.getItem(this.QUOTA_U) || 0);
   }
 
-  getPlan(): string { return localStorage.getItem(this.PLAN_KEY) || ''; }
-  getSubscriptionStatut(): string { return localStorage.getItem(this.SUB_STATUT) || 'inactive'; }
+  getPlan(): string { return sessionStorage.getItem(this.PLAN_KEY) || ''; }
+  getSubscriptionStatut(): string { return sessionStorage.getItem(this.SUB_STATUT) || 'inactive'; }
 
   isAdmin(): boolean {
-    return localStorage.getItem(this.IS_ADMIN) === '1';
+    return sessionStorage.getItem(this.IS_ADMIN) === '1';
   }
 
   isLoggedIn(): boolean {
@@ -72,14 +72,14 @@ export class AuthService {
   }
 
   updateSubscription(res: any) {
-    localStorage.setItem(this.NOM_KEY,    res.nom          ?? this.getNom());
-    localStorage.setItem(this.QUOTA_M,    res.quota_mensuel ?? this.getQuotaMensuel());
-    localStorage.setItem(this.QUOTA_U,    res.quota_utilise ?? this.getQuotaUtilise());
-    localStorage.setItem(this.PLAN_KEY,   res.plan          ?? this.getPlan());
-    localStorage.setItem(this.SUB_STATUT, res.subscription_statut ?? this.getSubscriptionStatut());
+    sessionStorage.setItem(this.NOM_KEY,    res.nom          ?? this.getNom());
+    sessionStorage.setItem(this.QUOTA_M,    res.quota_mensuel ?? this.getQuotaMensuel());
+    sessionStorage.setItem(this.QUOTA_U,    res.quota_utilise ?? this.getQuotaUtilise());
+    sessionStorage.setItem(this.PLAN_KEY,   res.plan          ?? this.getPlan());
+    sessionStorage.setItem(this.SUB_STATUT, res.subscription_statut ?? this.getSubscriptionStatut());
   }
 
   logout() {
-    localStorage.clear();
+    sessionStorage.clear();
   }
 }

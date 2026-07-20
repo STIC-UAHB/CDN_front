@@ -1,0 +1,71 @@
+<div class="doc-prose">
+  <h1>Gérer les préférences utilisateur</h1>
+  <p class="doc-lead">
+    Les <b>préférences</b> permettent à chacun de vos utilisateurs finaux de personnaliser son
+    expérience : désactiver un canal précis, désactiver une règle entière, ou enregistrer son
+    <code class="doc-inline">device_token</code> pour recevoir des notifications push.
+  </p>
+  <div class="doc-callout">
+    <b>C'est vous qui construisez l'interface.</b> BabelNotif ne fournit aucun écran de préférences pour
+    vos utilisateurs finaux — c'est à votre application d'exposer un réglage (ex : une page "Notifications"
+    dans vos paramètres de compte) où l'utilisateur choisit ses canaux, puis d'appeler l'endpoint ci-dessous
+    à chaque modification pour la transmettre à BabelNotif.
+  </div>
+
+  <h2>Comment les préférences priment sur les règles</h2>
+  <p>À l'envoi, pour chaque canal, BabelNotif applique cet ordre de priorité :</p>
+  <ol>
+    <li>Si la règle est <code class="doc-inline">non_desactivable</code> → les préférences sont ignorées, le default de la règle s'applique toujours.</li>
+    <li>Sinon, si l'utilisateur a une préférence enregistrée pour ce canal → elle prévaut.</li>
+    <li>Sinon → le default de la règle s'applique.</li>
+  </ol>
+
+  <h2>Mettre à jour une préférence</h2>
+  <div class="doc-endpoint"><span class="doc-method post">POST</span> /api/preferences</div>
+  <table class="doc-table">
+    <tr><th>Champ</th><th>Type</th><th>Description</th></tr>
+    <tr><td>user_id</td><td>string</td><td class="doc-td-gray">L'utilisateur concerné</td></tr>
+    <tr><td>event_code</td><td>string</td><td class="doc-td-gray">La règle concernée (doit exister)</td></tr>
+    <tr><td>rule_actif</td><td>boolean</td><td class="doc-td-gray">Interrupteur maître — <code class="doc-inline">false</code> désactive toute la règle pour cet utilisateur</td></tr>
+    <tr><td>sms_actif / email_actif / push_actif / socket_actif</td><td>boolean</td><td class="doc-td-gray">Override canal par canal (n'envoyer que si différent du default de la règle)</td></tr>
+    <tr><td>device_token</td><td>string</td><td class="doc-td-gray">Token Firebase FCM de l'appareil, nécessaire pour recevoir le canal push</td></tr>
+  </table>
+
+  <h3>Exemple — désactiver le SMS pour un événement précis</h3>
+  <pre class="doc-code">curl -X POST \
+  -H "Authorization: Bearer bn_live_..." \
+  -H "Content-Type: application/json" \
+  -d '&#123;
+    "user_id": "USR123",
+    "event_code": "payment_confirmed",
+    "sms_actif": false
+  &#125;' \
+  https://votre-cdn.com/api/preferences</pre>
+
+  <h3>Exemple — désactiver complètement une règle non critique</h3>
+  <pre class="doc-code">curl -X POST \
+  -H "Authorization: Bearer bn_live_..." \
+  -H "Content-Type: application/json" \
+  -d '&#123;"user_id": "USR123", "event_code": "weekly_report", "rule_actif": false&#125;' \
+  https://votre-cdn.com/api/preferences</pre>
+  <div class="doc-callout">
+    <b>Note :</b> une règle marquée <code class="doc-inline">non_desactivable</code> (typiquement un OTP de sécurité)
+    ignore <code class="doc-inline">rule_actif</code> — l'utilisateur ne peut pas la couper.
+  </div>
+
+  <div class="doc-callout">
+    <b>D'où vient le device_token ?</b> Ce n'est pas BabelNotif qui le génère — voir
+    <a routerLink="/documentation/push">Intégrer le Push</a> pour le guide complet (SDK Firebase, permission
+    navigateur, service worker).
+  </div>
+
+  <h2>Lire les préférences d'un utilisateur</h2>
+  <div class="doc-endpoint"><span class="doc-method get">GET</span> /api/preferences/&#123;user_id&#125;</div>
+  <p>Renvoie toutes les préférences enregistrées pour cet utilisateur, avec la règle associée.</p>
+  <pre class="doc-code">curl \
+  -H "Authorization: Bearer bn_live_..." \
+  https://votre-cdn.com/api/preferences/USR123</pre>
+
+  <h2>Et ensuite ?</h2>
+  <p>Voir comment tout ça s'articule avec l'envoi dans <a routerLink="/documentation/notifications">Envoyer des notifications</a>.</p>
+</div>

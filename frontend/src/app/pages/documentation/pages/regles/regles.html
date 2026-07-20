@@ -1,0 +1,75 @@
+<div class="doc-prose">
+  <h1>Gérer les règles</h1>
+  <p class="doc-lead">
+    Une <b>règle</b> représente un événement de votre application qui doit être signalé à un utilisateur
+    (ex : un paiement reçu, un compte qui expire, un abonnement qui se termine). Pour chaque règle, vous
+    définissez <b>sur quels canaux</b> l'informer par défaut et <b>avec quel message</b>. L'ensemble de vos
+    règles forme le catalogue des événements que BabelNotif sait notifier — c'est la première chose à
+    configurer avant d'appeler <code class="doc-inline">/notify</code>.
+  </p>
+  <p>
+    Vous pouvez créer et consulter vos règles directement depuis le <b>dashboard</b> (onglet Règles).
+    L'endpoint ci-dessous fait exactement la même chose, requiert le JWT (le même
+    <a routerLink="/documentation/integration-api">jeton obtenu à la connexion</a>) — c'est donc une
+    action liée à votre session dashboard, pas une automatisation depuis votre code. Pour synchroniser
+    vos règles depuis un script ou un pipeline CI/CD sans dépendre d'un JWT, utilisez plutôt
+    <a href="#import">l'import en masse</a> ci-dessous, qui accepte aussi la clé API.
+  </p>
+
+  <h2>Créer une règle par API</h2>
+  <div class="doc-endpoint"><span class="doc-method post">POST</span> /api/regles <span class="doc-badge">JWT</span></div>
+  <table class="doc-table">
+    <tr><th>Champ</th><th>Type</th><th>Description</th></tr>
+    <tr><td>event_code</td><td>string</td><td class="doc-td-gray">Identifiant unique de l'événement (utilisé ensuite dans <code class="doc-inline">/notify</code>)</td></tr>
+    <tr><td>message_template</td><td>string</td><td class="doc-td-gray">Texte du message, avec des variables entre accolades : <code class="doc-inline">&#123;variable&#125;</code></td></tr>
+    <tr><td>description</td><td>string</td><td class="doc-td-gray">Note libre pour vous y retrouver (optionnel)</td></tr>
+    <tr><td>sms_actif</td><td>boolean</td><td class="doc-td-gray">Canal SMS actif par défaut</td></tr>
+    <tr><td>email_actif</td><td>boolean</td><td class="doc-td-gray">Canal email actif par défaut</td></tr>
+    <tr><td>push_actif</td><td>boolean</td><td class="doc-td-gray">Canal push actif par défaut</td></tr>
+    <tr><td>socket_actif</td><td>boolean</td><td class="doc-td-gray">Canal WebSocket actif par défaut</td></tr>
+    <tr><td>non_desactivable</td><td>boolean</td><td class="doc-td-gray">Si vrai, l'utilisateur final ne peut jamais désactiver ce canal via ses préférences (ex : un code de sécurité)</td></tr>
+  </table>
+  <pre class="doc-code">curl -X POST \
+  -H "Authorization: Bearer &#123;jwt&#125;" \
+  -H "Content-Type: application/json" \
+  -d '&#123;
+    "event_code": "payment_confirmed",
+    "message_template": "Paiement de &#123;amount&#125; FCFA confirmé, merci &#123;name&#125; !",
+    "sms_actif": false,
+    "email_actif": true,
+    "push_actif": false,
+    "socket_actif": true,
+    "non_desactivable": false
+  &#125;' \
+  https://votre-cdn.com/api/regles
+
+<span class="cm">// Réponse 201</span>
+&#123;
+  "id": 20,
+  "event_code": "payment_confirmed",
+  "message_template": "Paiement de &#123;amount&#125; FCFA confirmé, merci &#123;name&#125; !",
+  "email_actif": true,
+  "socket_actif": true,
+  "actif": true
+&#125;</pre>
+
+  <h2>Télécharger un modèle</h2>
+  <div class="doc-endpoint"><span class="doc-method get">GET</span> /api/regles/template <span class="doc-badge">JWT</span></div>
+  <p>Télécharge un fichier JSON vide au bon format, pratique pour préparer un import en masse.</p>
+
+  <h2 id="import">Importer plusieurs règles en masse</h2>
+  <div class="doc-endpoint"><span class="doc-method post">POST</span> /api/regles/import <span class="doc-badge">JWT ou clé API</span></div>
+  <p>Accepte un tableau de règles — utile pour synchroniser vos règles depuis un fichier de config versionné (CI/CD). Chaque règle est créée ou mise à jour si <code class="doc-inline">event_code</code> existe déjà.</p>
+  <pre class="doc-code">curl -X POST \
+  -H "Authorization: Bearer &#123;jwt_ou_api_key&#125;" \
+  -H "Content-Type: application/json" \
+  -d '[
+    &#123;"event_code": "payment_confirmed", "message_template": "...", "email_actif": true&#125;,
+    &#123;"event_code": "payment_failed", "message_template": "...", "sms_actif": true&#125;
+  ]' \
+  https://votre-cdn.com/api/regles/import</pre>
+  <div class="doc-callout">Nécessite un forfait actif — sinon <code class="doc-inline">402 no_active_subscription</code>.</div>
+
+  <h2>Et ensuite ?</h2>
+  <p>Une fois vos règles créées, personnalisez le comportement par utilisateur avec les <a routerLink="/documentation/preferences">préférences</a>, ou déclenchez l'envoi avec <a routerLink="/documentation/notifications">/notify</a>.</p>
+</div>

@@ -1,0 +1,55 @@
+<div class="doc-prose">
+  <h1>Qu'est-ce que BabelNotif ?</h1>
+  <p class="doc-lead">
+    BabelNotif est une <b>infrastructure de notification</b> pour applications SaaS. Vous lui envoyez
+    un événement ("un paiement a été reçu", "un compte a expiré"...), et c'est elle qui décide comment
+    prévenir votre utilisateur final : par SMS, email, notification push, ou en temps réel via WebSocket.
+  </p>
+
+  <h2>Le problème que ça résout</h2>
+  <p>
+    Sans BabelNotif, une application SaaS qui veut notifier ses utilisateurs sur plusieurs canaux doit
+    elle-même :
+  </p>
+  <ul>
+    <li>Intégrer et maintenir plusieurs fournisseurs (API SMS, serveur SMTP, Firebase pour le push, un serveur WebSocket)</li>
+    <li>Gérer les préférences de chaque utilisateur pour chaque canal</li>
+    <li>Gérer les échecs de livraison et les nouvelles tentatives</li>
+    <li>Gérer le cas où un canal ne peut pas être livré (par exemple si l'utilisateur n'est pas connecté au WebSocket)</li>
+  </ul>
+  <p>
+    BabelNotif centralise tout ça : votre application n'a qu'un seul appel API à connaître
+    (<code class="doc-inline">POST /api/notify</code>), et c'est BabelNotif qui gère la complexité derrière.
+  </p>
+
+  <h2>Comment ça marche, en résumé</h2>
+  <ol>
+    <li><b>Vous configurez des règles</b> — chaque règle représente un événement de votre application qui doit informer un utilisateur (ex : <code class="doc-inline">payment_received</code>), avec les canaux à utiliser par défaut.</li>
+    <li><b>Votre application propose un réglage de notifications à vos utilisateurs</b> — c'est à vous de construire cette interface dans votre propre app (ex : une page "Préférences de notification"), et de transmettre les choix de l'utilisateur à BabelNotif via <code class="doc-inline">POST /api/preferences</code>. BabelNotif ne fournit pas cette interface, seulement le stockage et l'application de ces préférences.</li>
+    <li><b>Votre backend déclenche l'événement</b> — un simple appel <code class="doc-inline">POST /api/notify</code> avec l'identifiant de votre utilisateur et les données du message.</li>
+    <li><b>BabelNotif détermine les canaux actifs</b> — en tenant compte de la règle et des préférences propres à cet utilisateur, enregistrées à l'étape 2.</li>
+    <li><b>BabelNotif envoie et gère la fiabilité</b> — retries automatiques en cas d'échec technique, et bascule vers un canal de secours si une notification temps réel n'est jamais lue.</li>
+  </ol>
+  <p>Voir <a routerLink="/documentation/preferences">Gérer les préférences</a> pour l'intégration détaillée.</p>
+
+  <h2>Les 4 canaux disponibles</h2>
+  <table class="doc-table">
+    <tr><th>Canal</th><th>Fournisseur</th><th>Cas d'usage typique</th></tr>
+    <tr><td><b>SMS</b></td><td class="doc-td-gray">API Orange</td><td class="doc-td-gray">Codes OTP, alertes critiques</td></tr>
+    <tr><td><b>Email</b></td><td class="doc-td-gray">SMTP</td><td class="doc-td-gray">Confirmations, récapitulatifs, factures</td></tr>
+    <tr><td><b>Push</b></td><td class="doc-td-gray">Firebase FCM</td><td class="doc-td-gray">Notifications mobile même app fermée</td></tr>
+    <tr><td><b>WebSocket</b></td><td class="doc-td-gray">Laravel Reverb</td><td class="doc-td-gray">Notifications instantanées, utilisateur connecté</td></tr>
+  </table>
+
+  <h2>Pour qui ?</h2>
+  <p>
+    Pour toute équipe qui développe une application SaaS et ne veut pas réinventer sa propre couche de
+    notification multi-canal — vous gardez votre logique métier, BabelNotif gère l'envoi.
+  </p>
+
+  <h2>Prêt à commencer ?</h2>
+  <p>
+    Direction <a routerLink="/documentation/demarrage">Démarrage</a> pour créer votre compte et récupérer
+    votre clé API.
+  </p>
+</div>

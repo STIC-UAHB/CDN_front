@@ -1,0 +1,75 @@
+<div class="doc-prose">
+  <h1>Envoyer des notifications</h1>
+  <div class="doc-endpoint"><span class="doc-method post">POST</span> /api/notify</div>
+  <p class="doc-lead">
+    L'endpoint central : déclenche l'envoi d'une notification pour un événement donné.
+    C'est le seul appel que votre backend a besoin de connaître pour toute la logique d'envoi.
+  </p>
+
+  <h2>Ce que fait BabelNotif quand vous appelez /notify</h2>
+  <ol>
+    <li>Valide les données reçues (<code class="doc-inline">event</code>, <code class="doc-inline">user_id</code>, <code class="doc-inline">to</code> requis)</li>
+    <li>Vérifie votre clé API et que votre compte est actif</li>
+    <li>Cherche la règle active correspondant à <code class="doc-inline">event</code></li>
+    <li>Vérifie les préférences de <code class="doc-inline">user_id</code> pour cette règle (un utilisateur peut avoir désactivé un canal, ou la règle entière)</li>
+    <li>Détermine la liste finale des canaux actifs</li>
+    <li>Compile le message en remplaçant les <code class="doc-inline">&#123;variable&#125;</code> du template par les valeurs de <code class="doc-inline">variables</code></li>
+    <li>Crée une notification par canal actif et l'envoie (ou la planifie si <code class="doc-inline">scheduled_at</code> est fourni)</li>
+    <li>Incrémente votre quota utilisé</li>
+  </ol>
+
+  <h2>Paramètres</h2>
+  <table class="doc-table">
+    <tr><th>Champ</th><th>Type</th><th>Requis</th><th>Description</th></tr>
+    <tr><td>event</td><td>string</td><td class="doc-td-gray">oui</td><td class="doc-td-gray">Code de l'événement, doit correspondre à une règle active</td></tr>
+    <tr><td>user_id</td><td>string</td><td class="doc-td-gray">oui</td><td class="doc-td-gray">Identifiant de votre utilisateur final</td></tr>
+    <tr><td>to.email</td><td>string</td><td class="doc-td-gray">conditionnel</td><td class="doc-td-gray">Adresse email — requis si <code class="doc-inline">to.sms</code> absent</td></tr>
+    <tr><td>to.sms</td><td>string</td><td class="doc-td-gray">conditionnel</td><td class="doc-td-gray">Numéro de téléphone — requis si <code class="doc-inline">to.email</code> absent</td></tr>
+    <tr><td>variables</td><td>object</td><td class="doc-td-gray">non</td><td class="doc-td-gray">Valeurs injectées dans le <code class="doc-inline">message_template</code> de la règle</td></tr>
+    <tr><td>scheduled_at</td><td>string (ISO date)</td><td class="doc-td-gray">non</td><td class="doc-td-gray">Date future — la notification est planifiée au lieu d'être envoyée immédiatement</td></tr>
+  </table>
+  <div class="doc-callout">
+    <b>Important :</b> même si votre règle n'active que <code class="doc-inline">push</code> ou <code class="doc-inline">socket</code>,
+    vous devez quand même fournir <code class="doc-inline">to.email</code> ou <code class="doc-inline">to.sms</code> —
+    c'est ce qui sert de destination si BabelNotif doit escalader vers un canal de secours
+    (voir <a routerLink="/documentation/escalade">Canal de secours</a>).
+  </div>
+
+  <h2>Exemple</h2>
+  <pre class="doc-code"><span class="cm"># Envoi immédiat</span>
+curl -X POST \
+  -H "Authorization: Bearer bn_live_..." \
+  -H "Content-Type: application/json" \
+  -d '&#123;
+    "event": "payment_confirmed",
+    "user_id": "USR123",
+    "to": &#123;"email": "client&#64;exemple.com"&#125;,
+    "variables": &#123;"amount": "5000", "name": "Aïssatou"&#125;
+  &#125;' \
+  https://votre-cdn.com/api/notify</pre>
+  <pre class="doc-code"><span class="cm"># Envoi planifié</span>
+curl -X POST \
+  -H "Authorization: Bearer bn_live_..." \
+  -H "Content-Type: application/json" \
+  -d '&#123;
+    "event": "subscription_reminder",
+    "user_id": "USR123",
+    "to": &#123;"email": "client&#64;exemple.com"&#125;,
+    "scheduled_at": "2026-07-10T09:00:00Z"
+  &#125;' \
+  https://votre-cdn.com/api/notify</pre>
+  <pre class="doc-code"><span class="cm">// Réponse 201</span>
+&#123;
+  "message": "Notification(s) mise(s) en queue.",
+  "canaux": ["email", "socket"],
+  "notification_ids": [142, 143],
+  "scheduled_at": null
+&#125;</pre>
+
+  <h2>Cas particuliers</h2>
+  <ul>
+    <li>Si aucun canal n'est actif pour cet utilisateur et cette règle (préférences désactivées), la réponse est <code class="doc-inline">200</code> avec un message informatif — aucune erreur, aucune notification créée.</li>
+    <li>Le canal <code class="doc-inline">push</code> est automatiquement ignoré si l'utilisateur n'a pas de <code class="doc-inline">device_token</code> enregistré (voir <a routerLink="/documentation/preferences">Gérer les préférences</a>).</li>
+    <li>Les codes d'erreur possibles sont listés dans <a routerLink="/documentation/integration-api">Intégrer l'API</a>.</li>
+  </ul>
+</div>

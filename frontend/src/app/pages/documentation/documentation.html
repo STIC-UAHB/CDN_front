@@ -1,0 +1,49 @@
+<div class="doc-mobile-bar">
+  <button class="doc-burger" (click)="toggleSidebar()">☰</button>
+  <div class="logo" routerLink="/">
+    <div class="logo-sq">BN</div>
+    <span class="logo-nm">BabelNotif</span>
+  </div>
+</div>
+
+<div class="doc-backdrop" [class.visible]="sidebarOuverte()" (click)="sidebarOuverte.set(false)"></div>
+
+<div class="doc-layout">
+  <aside class="doc-sidebar" [class.open]="sidebarOuverte()">
+    <div class="doc-sidebar-logo" routerLink="/">
+      <div class="logo-sq">BN</div>
+      <span class="logo-nm">BabelNotif</span>
+    </div>
+    <a class="doc-back-link" routerLink="/">← Retour au site</a>
+
+    <nav class="doc-sidebar-inner">
+      <div class="doc-side-group">
+        <div class="doc-side-label">Introduction</div>
+        <a routerLink="introduction" routerLinkActive="active">Qu'est-ce que BabelNotif ?</a>
+      </div>
+      <div class="doc-side-group">
+        <div class="doc-side-label">Démarrage</div>
+        <a routerLink="demarrage" routerLinkActive="active">Créer un compte & clé API</a>
+      </div>
+      <div class="doc-side-group">
+        <div class="doc-side-label">Intégration</div>
+        <a routerLink="integration-api" routerLinkActive="active">Intégrer l'API</a>
+      </div>
+      <div class="doc-side-group">
+        <div class="doc-side-label">Fonctionnalités</div>
+        <a routerLink="notifications" routerLinkActive="active">Envoyer des notifications</a>
+        <a routerLink="regles" routerLinkActive="active">Gérer les règles</a>
+        <a routerLink="preferences" routerLinkActive="active">Gérer les préférences</a>
+        <a routerLink="websocket" routerLinkActive="active">Intégrer le WebSocket</a>
+        <a routerLink="push" routerLinkActive="active">Intégrer le Push</a>
+        <a routerLink="escalade" routerLinkActive="active">Canal de secours</a>
+      </div>
+    </nav>
+  </aside>
+
+  <main class="doc-main">
+    <div class="doc-main-inner">
+      <router-outlet></router-outlet>
+    </div>
+  </main>
+</div>

@@ -1,0 +1,114 @@
+:host {
+  display: block;
+  font-family: 'Inter', sans-serif;
+}
+
+.doc-layout {
+  display: flex;
+  min-height: 100vh;
+  background: var(--bg);
+}
+
+/* ── Barre mobile (cachée sur desktop) ── */
+.doc-mobile-bar {
+  display: none;
+  align-items: center;
+  gap: 14px;
+  background: var(--navy);
+  height: 52px;
+  padding: 0 16px;
+  position: sticky;
+  top: 0;
+  z-index: 120;
+}
+.doc-burger {
+  background: none; border: none; color: #fff; font-size: 20px;
+  cursor: pointer; padding: 4px 6px;
+}
+.doc-backdrop {
+  display: none;
+}
+
+/* ── SIDEBAR (même pattern que le dashboard : fixe, flush à gauche) ── */
+.doc-sidebar {
+  width: 240px;
+  flex-shrink: 0;
+  background: var(--navy);
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  top: 0; left: 0; bottom: 0;
+  z-index: 50;
+}
+.doc-sidebar-logo {
+  display: flex; align-items: center; gap: 10px;
+  padding: 20px 20px 14px; cursor: pointer;
+  border-bottom: 1px solid rgba(255,255,255,.08);
+}
+.logo-sq {
+  width: 30px; height: 30px;
+  background: #fff; border-radius: 7px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; font-weight: 800; color: var(--navy);
+}
+.logo-nm { font-size: 15px; font-weight: 700; color: #fff; }
+.doc-back-link {
+  display: block; font-size: 12px; color: rgba(255,255,255,.5);
+  text-decoration: none; padding: 12px 20px; border-bottom: 1px solid rgba(255,255,255,.08);
+}
+.doc-back-link:hover { color: #fff; }
+
+.doc-sidebar-inner { flex: 1; padding: 16px 12px; overflow-y: auto; }
+.doc-side-label {
+  font-size: 10px; font-weight: 600; text-transform: uppercase;
+  letter-spacing: 0.08em; color: rgba(255,255,255,.3);
+  padding: 0 8px; margin-bottom: 6px;
+}
+.doc-side-group { margin-bottom: 18px; }
+.doc-side-group a {
+  display: block;
+  padding: 9px 12px; border-radius: 8px;
+  font-size: 13px; font-weight: 500;
+  color: rgba(255,255,255,.6);
+  text-decoration: none; transition: all .15s; margin-bottom: 2px;
+}
+.doc-side-group a:hover { background: rgba(255,255,255,.08); color: #fff; }
+.doc-side-group a.active { background: var(--primary); color: #fff; }
+
+/* ── CONTENU ── */
+.doc-main {
+  flex: 1;
+  margin-left: 240px;
+  background: #fff;
+  min-height: 100vh;
+  min-width: 0;
+}
+.doc-main-inner {
+  max-width: 1100px;
+  padding: 48px 56px;
+}
+
+/* ── RESPONSIVE : sidebar en tiroir sur petit écran ── */
+@media (max-width: 860px) {
+  .doc-mobile-bar { display: flex; }
+
+  .doc-sidebar {
+    top: 52px;
+    transform: translateX(-100%);
+    transition: transform .2s ease;
+    z-index: 150;
+  }
+  .doc-sidebar.open { transform: translateX(0); }
+  .doc-sidebar-logo { display: none; }
+
+  .doc-backdrop.visible {
+    display: block;
+    position: fixed;
+    top: 52px; left: 0; right: 0; bottom: 0;
+    background: rgba(15,23,42,.5);
+    z-index: 140;
+  }
+
+  .doc-main { margin-left: 0; }
+  .doc-main-inner { padding: 28px 20px; }
+}

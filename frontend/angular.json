@@ -55,6 +55,9 @@
         },
         "serve": {
           "builder": "@angular/build:dev-server",
+          "options": {
+            "allowedHosts": ["indira-predemocratic-intensionally.ngrok-free.dev"]
+          },
           "configurations": {
             "production": {
               "buildTarget": "frontend:build:production"

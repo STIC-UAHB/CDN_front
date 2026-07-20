@@ -1,0 +1,58 @@
+<div class="doc-prose">
+  <h1>Canal de secours</h1>
+  <p class="doc-lead">
+    Si une notification WebSocket n'est jamais confirmée comme lue, BabelNotif bascule automatiquement
+    vers un canal de secours — un comportement comparable à ce que proposent Knock ou Novu.
+  </p>
+
+  <h2>Pourquoi ce mécanisme existe</h2>
+  <p>
+    Le canal <code class="doc-inline">socket</code> n'a aucune garantie de livraison : si votre
+    utilisateur n'est pas connecté au moment de l'envoi, le message est perdu sans que personne ne le
+    sache. Plutôt que de laisser ce risque sans filet, BabelNotif surveille chaque notification socket
+    et, passé un délai, la relance sur un autre canal.
+  </p>
+
+  <h2>Règles du mécanisme</h2>
+  <ul>
+    <li><b>Bascule directe</b> — un seul délai d'attente, pas de répétitions sur le socket avant de basculer.</li>
+    <li><b>Pas de doublon</b> — si un autre canal (par exemple l'email) a déjà été notifié en parallèle pour le même événement, aucune escalade n'est déclenchée : c'est déjà couvert.</li>
+    <li><b>Canal de secours configurable</b> — celui que vous définissez ci-dessous, ou <code class="doc-inline">email</code> par défaut si rien n'est configuré.</li>
+    <li><b>Se base sur <code class="doc-inline">to.email</code>/<code class="doc-inline">to.sms</code></b> — la destination utilisée pour le canal de secours est celle fournie dans l'appel <code class="doc-inline">/notify</code> d'origine (voir <a routerLink="/documentation/notifications">Envoyer des notifications</a>).</li>
+  </ul>
+
+  <h2>Configurer votre canal de secours</h2>
+  <div class="doc-endpoint"><span class="doc-method get">GET</span> / <span class="doc-method post">POST</span> /api/fallback-canaux <span class="doc-badge">JWT</span></div>
+  <table class="doc-table">
+    <tr><th>Champ</th><th>Type</th><th>Description</th></tr>
+    <tr><td>canal_principal</td><td>string</td><td class="doc-td-gray">Le canal à surveiller — <code class="doc-inline">socket</code> aujourd'hui</td></tr>
+    <tr><td>canal_fallback</td><td>string</td><td class="doc-td-gray">Le canal de secours — doit être différent du principal</td></tr>
+    <tr><td>actif</td><td>boolean</td><td class="doc-td-gray">Défaut : true</td></tr>
+  </table>
+  <pre class="doc-code">curl -X POST \
+  -H "Authorization: Bearer &#123;jwt&#125;" \
+  -H "Content-Type: application/json" \
+  -d '&#123;"canal_principal": "socket", "canal_fallback": "email"&#125;' \
+  https://votre-cdn.com/api/fallback-canaux</pre>
+  <p>Cette configuration est également modifiable directement depuis le dashboard, onglet Paramètres.</p>
+
+  <h2>Exemple concret</h2>
+  <ol>
+    <li>Votre backend appelle <code class="doc-inline">/notify</code> avec une règle qui n'active que <code class="doc-inline">socket</code></li>
+    <li>La notification est diffusée en direct — mais votre utilisateur n'est pas connecté</li>
+    <li>Après le délai configuré, sans confirmation de lecture, BabelNotif crée automatiquement une nouvelle notification sur votre canal de secours (email par défaut)</li>
+    <li>Votre utilisateur reçoit finalement l'information, sans que vous ayez eu à coder quoi que ce soit de plus</li>
+  </ol>
+
+  <div class="doc-callout">
+    <b>Pas besoin de configurer quoi que ce soit :</b> même sans appeler <code class="doc-inline">/api/fallback-canaux</code>,
+    l'escalade fonctionne dès le départ — elle bascule simplement vers <code class="doc-inline">email</code> par défaut.
+    Configurez cet endpoint seulement si vous voulez un canal de secours différent.
+  </div>
+
+  <h2>Voir aussi</h2>
+  <ul>
+    <li><a routerLink="/documentation/websocket">Intégrer le WebSocket</a> — comment confirmer la lecture pour éviter l'escalade</li>
+    <li><a routerLink="/documentation/notifications">Envoyer des notifications</a> — le champ <code class="doc-inline">to</code> utilisé comme destination de secours</li>
+  </ul>
+</div>

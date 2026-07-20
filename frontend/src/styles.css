@@ -1,1 +1,85 @@
 /* You can add global styles to this file, and also import other style files */
+
+:root {
+  --navy: #1a2035;
+  --navy2: #1e2847;
+  --bg: #eef0f3;
+  --primary: #4f46e5;
+  --primary2: #7c3aed;
+  --accent: #06b6d4;
+  --green: #10b981;
+  --yellow: #f59e0b;
+  --gray: #64748b;
+  --gray2: #94a3b8;
+  --border: #e2e8f0;
+  --lavender: #eef2ff;
+}
+
+/* ── Contenu documentation (partagé par toutes les pages /documentation) ── */
+.doc-prose { font-family: 'Inter', sans-serif; color: #0f172a; }
+.doc-prose h1 { font-size: 32px; font-weight: 800; letter-spacing: -1px; margin: 0 0 8px; }
+.doc-lead { font-size: 15px; color: var(--gray); margin: 0 0 32px; line-height: 1.7; }
+.doc-prose h2 { font-size: 21px; font-weight: 700; margin: 40px 0 12px; letter-spacing: -0.3px; scroll-margin-top: 20px; }
+.doc-prose h3 { font-size: 15.5px; font-weight: 700; margin: 24px 0 8px; color: #0f172a; }
+.doc-prose p { font-size: 14px; color: var(--gray); line-height: 1.75; margin: 0 0 14px; }
+.doc-prose ul, .doc-prose ol { margin: 0 0 16px; padding-left: 20px; }
+.doc-prose li { font-size: 14px; color: var(--gray); line-height: 1.75; margin-bottom: 6px; }
+.doc-prose a { color: var(--primary); text-decoration: none; }
+.doc-prose a:hover { text-decoration: underline; }
+.doc-section { margin-bottom: 8px; }
+
+.doc-code {
+  background: #f8fafc; color: #1e293b; border: 1px solid var(--border); border-radius: 10px;
+  padding: 18px 20px; font-family: 'Menlo', 'Consolas', monospace;
+  font-size: 13px; line-height: 1.85; overflow-x: auto; margin: 0 0 20px;
+  white-space: pre;
+}
+.doc-code .cm { color: var(--gray2); }
+.doc-inline {
+  background: var(--lavender); color: var(--primary); padding: 2px 6px;
+  border-radius: 5px; font-family: 'Menlo', 'Consolas', monospace; font-size: 12.5px;
+}
+
+.doc-endpoint {
+  display: inline-flex; align-items: center; gap: 10px;
+  font-family: 'Menlo', 'Consolas', monospace; font-size: 13px; font-weight: 700;
+  background: #f8fafc; border: 1px solid var(--border); border-radius: 8px;
+  padding: 8px 14px; margin-bottom: 14px; color: #0f172a;
+}
+.doc-method { padding: 2px 9px; border-radius: 5px; font-size: 11px; color: #fff; letter-spacing: 0.3px; }
+.doc-method.get { background: var(--accent); }
+.doc-method.post { background: var(--green); }
+
+.doc-table { width: 100%; border-collapse: collapse; margin-bottom: 24px; font-size: 13px; }
+.doc-table th { text-align: left; font-size: 11px; text-transform: uppercase; letter-spacing: 0.3px; color: var(--gray); border-bottom: 1px solid var(--border); padding: 8px 12px; }
+.doc-table td { padding: 10px 12px; border-bottom: 1px solid var(--border); color: #0f172a; vertical-align: top; }
+.doc-td-gray { color: var(--gray) !important; }
+
+.doc-callout {
+  background: var(--lavender); border: 1px solid #c7d2fe; border-radius: 10px;
+  padding: 14px 18px; font-size: 13px; color: #3730a3; margin: 0 0 20px; line-height: 1.65;
+}
+.doc-callout b { color: #1e1b4b; }
+
+.doc-badge {
+  display: inline-block; background: #fef3c7; color: #92400e;
+  font-size: 11px; font-weight: 600; padding: 2px 9px; border-radius: 5px; margin-left: 8px;
+}
+
+.doc-status {
+  display: inline-block; font-family: 'Menlo', 'Consolas', monospace;
+  font-weight: 700; font-size: 12px; padding: 2px 9px; border-radius: 5px;
+}
+.doc-status.ok { background: #ecfdf5; color: #047857; }
+.doc-status.err { background: #fef2f2; color: #b91c1c; }
+
+.doc-steps { counter-reset: doc-step; list-style: none; padding-left: 0; margin: 0 0 24px; }
+.doc-steps > li {
+  counter-increment: doc-step; position: relative; padding: 0 0 20px 40px; margin: 0;
+}
+.doc-steps > li::before {
+  content: counter(doc-step); position: absolute; left: 0; top: 0;
+  width: 26px; height: 26px; border-radius: 50%; background: var(--primary); color: #fff;
+  font-size: 12px; font-weight: 700; display: flex; align-items: center; justify-content: center;
+}
+.doc-steps > li h3 { margin: 0 0 6px; }

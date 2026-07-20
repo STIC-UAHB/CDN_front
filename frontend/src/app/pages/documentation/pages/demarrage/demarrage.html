@@ -1,0 +1,79 @@
+<div class="doc-prose">
+  <h1>Créer un compte, se connecter et récupérer sa clé API</h1>
+  <p class="doc-lead">
+    Ces premières étapes se font depuis l'interface web de BabelNotif, pas par appel API — c'est un
+    humain qui les fait une seule fois, avant que votre backend n'appelle quoi que ce soit.
+  </p>
+
+  <ol class="doc-steps">
+    <li>
+      <h3>Créer un compte</h3>
+      <p>
+        Depuis la page d'accueil, cliquez sur "Commencer". Le formulaire d'inscription demande :
+      </p>
+      <ul>
+        <li><b>Nom de l'application</b> — ex : websms</li>
+        <li><b>Email de contact</b></li>
+        <li><b>Téléphone</b></li>
+        <li><b>Mot de passe</b> et sa confirmation</li>
+        <li>L'acceptation des conditions d'utilisation</li>
+      </ul>
+      <p>Le compte est créé avec un quota de 0 — aucune notification ne peut être envoyée tant qu'un forfait n'est pas souscrit (dernière étape ci-dessous).</p>
+    </li>
+
+    <li>
+      <h3>Vérifier votre identité (OTP)</h3>
+      <p>
+        Après l'inscription, choisissez le canal de vérification (email ou SMS) puis entrez le code
+        reçu. Cette étape confirme que l'email/téléphone fourni vous appartient bien.
+      </p>
+    </li>
+
+    <li>
+      <h3>Se connecter</h3>
+      <p>
+        Depuis la page "Se connecter", entrez votre email de contact et votre mot de passe.
+        Vous accédez alors à votre dashboard.
+      </p>
+    </li>
+
+    <li>
+      <h3>Retrouver votre clé API</h3>
+      <p>
+        Dans le dashboard, section <b>Paramètres → Informations du compte</b>, votre clé API est
+        affichée dans un champ dédié (format <code class="doc-inline">bn_live_...</code>), avec un
+        bouton pour la copier directement.
+      </p>
+      <div class="doc-callout">
+        <b>Gardez cette clé secrète.</b> Ne la partagez jamais publiquement — c'est elle qui identifie
+        et authentifie votre backend auprès de BabelNotif (voir <a routerLink="/documentation/integration-api">Intégrer l'API</a>).
+      </div>
+    </li>
+
+    <li>
+      <h3>Souscrire à un forfait</h3>
+      <p>
+        Depuis l'onglet <b>Forfaits</b> du dashboard, choisissez un plan et payez via Wave (mobile money) :
+      </p>
+      <table class="doc-table">
+        <tr><th>Forfait</th><th>Prix</th><th>Quota SMS + Email</th></tr>
+        <tr><td>Starter</td><td class="doc-td-gray">100 FCFA / mois</td><td class="doc-td-gray">1 000 notifications</td></tr>
+        <tr><td>Pro</td><td class="doc-td-gray">15 000 FCFA / mois</td><td class="doc-td-gray">5 000 notifications</td></tr>
+        <tr><td>Business</td><td class="doc-td-gray">35 000 FCFA / mois</td><td class="doc-td-gray">20 000 notifications</td></tr>
+      </table>
+      <div class="doc-callout">
+        <b>Push et WebSocket sont illimités et inclus dans tous les forfaits</b> — seuls les canaux
+        SMS et Email consomment votre quota mensuel.
+      </div>
+      <p>Le paiement est confirmé automatiquement dès validation côté Wave, et votre quota est activé sans action supplémentaire de votre part.</p>
+    </li>
+  </ol>
+
+  <h2>Et après ?</h2>
+  <p>
+    Avant de tester ou d'envoyer la moindre notification, créez au moins une <a routerLink="/documentation/regles">règle</a>
+    (depuis le dashboard ou par API) — sans règle correspondant à votre événement, <code class="doc-inline">/notify</code>
+    refusera l'appel. Une fois la règle en place, direction <a routerLink="/documentation/integration-api">Intégrer l'API</a>
+    pour votre premier appel, cette fois-ci en code.
+  </p>
+</div>

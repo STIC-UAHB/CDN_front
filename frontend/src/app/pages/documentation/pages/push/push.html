@@ -1,0 +1,122 @@
+<div class="doc-prose">
+  <h1>Intégrer le Push</h1>
+  <p class="doc-lead">
+    Ce guide s'adresse au développeur qui construit le <b>frontend de votre application</b> (pas le
+    dashboard BabelNotif) — celui qui doit obtenir un <code class="doc-inline">device_token</code> auprès
+    de Firebase et l'enregistrer auprès de BabelNotif pour que le canal <code class="doc-inline">push</code>
+    fonctionne.
+  </p>
+  <div class="doc-callout">
+    <b>Web uniquement pour l'instant.</b> L'intégration ci-dessous couvre les applications web (navigateur).
+    Le push pour applications mobiles natives (Flutter, Android, iOS) n'est pas encore documenté — contactez-nous
+    si c'est votre besoin.
+  </div>
+
+  <h2>D'où vient le device_token ?</h2>
+  <p>
+    Le <code class="doc-inline">device_token</code> n'est pas généré par BabelNotif — c'est votre application
+    qui le récupère, via le SDK Firebase, en s'enregistrant auprès du <b>projet Firebase de BabelNotif</b>
+    (pas le vôtre). C'est le même principe que la clé Reverb partagée pour le
+    <a routerLink="/documentation/websocket">WebSocket</a> : tous les clients BabelNotif utilisent la même
+    configuration publique ci-dessous, parce que c'est le backend BabelNotif qui envoie effectivement les push.
+  </p>
+  <div class="doc-callout">
+    <b>Public, pas secret :</b> contrairement à la clé API, cette configuration Firebase est faite pour être
+    intégrée telle quelle dans votre code frontend (navigateur).
+  </div>
+
+  <h2>Étape 1 — Installer et configurer le SDK Firebase</h2>
+  <pre class="doc-code">npm install firebase</pre>
+  <pre class="doc-code"><span class="cm">// Côté frontend (navigateur) — configuration publique du projet BabelNotif</span>
+import &#123; initializeApp &#125; from 'firebase/app';
+import &#123; getMessaging, getToken &#125; from 'firebase/messaging';
+
+const firebaseConfig = &#123;
+  apiKey: "AIzaSyD_L3NCOV2MUJrXJVFJSXUj54pglpcKQh0",
+  authDomain: "babelnotif.firebaseapp.com",
+  projectId: "babelnotif",
+  storageBucket: "babelnotif.firebasestorage.app",
+  messagingSenderId: "207367888684",
+  appId: "1:207367888684:web:82338d8160e718f6729689"
+&#125;;
+
+const app = initializeApp(firebaseConfig);
+const messaging = getMessaging(app);</pre>
+
+  <h2>Étape 2 — Demander la permission et récupérer le token</h2>
+  <pre class="doc-code"><span class="cm">// Côté frontend (navigateur)</span>
+async function activerNotificationsPush(userId) &#123;
+  const permission = await Notification.requestPermission();
+  if (permission !== 'granted') return;
+
+  <span class="cm">// nécessite un service worker enregistré à la racine (voir plus bas)</span>
+  const registration = await navigator.serviceWorker.ready;
+
+  const token = await getToken(messaging, &#123;
+    vapidKey: 'BFjxK3Bx79oz4rFwjNS96AMoVAUg1YCu5uovtDNqxP5ae7JHKjHqfjxnZBucIgdvvD8F86uVYYd7-yQ3GqfQYBM',
+    serviceWorkerRegistration: registration,
+  &#125;);
+
+  <span class="cm">// on envoie le token à VOTRE PROPRE backend, jamais directement à BabelNotif</span>
+  await fetch('/mon-backend/enregistrer-push', &#123;
+    method: 'POST',
+    headers: &#123; 'Content-Type': 'application/json' &#125;,
+    body: JSON.stringify(&#123; user_id: userId, device_token: token &#125;),
+  &#125;);
+&#125;</pre>
+
+  <h2>Étape 3 — Recevoir en arrière-plan (service worker)</h2>
+  <p>
+    Le Web Push a besoin d'un <b>service worker</b> à la racine de votre domaine pour afficher une
+    notification quand votre onglet n'est pas au premier plan (ou fermé, tant que le navigateur tourne).
+    Créez un fichier <code class="doc-inline">firebase-messaging-sw.js</code> à la racine de votre site :
+  </p>
+  <pre class="doc-code"><span class="cm">// firebase-messaging-sw.js — à la racine de votre domaine</span>
+importScripts('https://www.gstatic.com/firebasejs/10.13.2/firebase-app-compat.js');
+importScripts('https://www.gstatic.com/firebasejs/10.13.2/firebase-messaging-compat.js');
+
+firebase.initializeApp(&#123;
+  apiKey: "AIzaSyD_L3NCOV2MUJrXJVFJSXUj54pglpcKQh0",
+  authDomain: "babelnotif.firebaseapp.com",
+  projectId: "babelnotif",
+  storageBucket: "babelnotif.firebasestorage.app",
+  messagingSenderId: "207367888684",
+  appId: "1:207367888684:web:82338d8160e718f6729689",
+&#125;);
+
+const messaging = firebase.messaging();
+
+messaging.onBackgroundMessage((payload) => &#123;
+  const &#123; title, body &#125; = payload.notification || &#123;&#125;;
+  self.registration.showNotification(title || 'Notification', &#123; body: body || '' &#125;);
+&#125;);</pre>
+  <div class="doc-callout">
+    <b>Premier plan vs arrière-plan :</b> quand votre onglet est actif, c'est plutôt <code class="doc-inline">onMessage()</code>
+    (dans votre code frontend normal) qui reçoit la notification — à vous de l'afficher dans votre UI. Le
+    service worker ci-dessus ne prend le relais que quand l'onglet n'est pas au premier plan.
+  </div>
+
+  <h2>Étape 4 — Votre backend relaie le token à BabelNotif</h2>
+  <p>Comme pour l'authentification WebSocket, c'est votre backend (qui détient la clé API) qui fait l'appel réel :</p>
+  <pre class="doc-code"><span class="cm">// Côté backend (le vôtre)</span>
+app.post('/mon-backend/enregistrer-push', async (req, res) => &#123;
+  await fetch('https://votre-cdn.com/api/preferences', &#123;
+    method: 'POST',
+    headers: &#123;
+      Authorization: `Bearer $&#123;BABELNOTIF_API_KEY&#125;`,
+      'Content-Type': 'application/json',
+    &#125;,
+    body: JSON.stringify(&#123;
+      user_id: req.body.user_id,
+      event_code: 'payment_confirmed', <span class="cm">// la règle concernée</span>
+      device_token: req.body.device_token,
+    &#125;),
+  &#125;);
+  res.sendStatus(200);
+&#125;);</pre>
+  <p>Ce même endpoint est documenté en détail dans <a routerLink="/documentation/preferences">Gérer les préférences</a> — c'est <code class="doc-inline">POST /api/preferences</code> avec le champ <code class="doc-inline">device_token</code>.</p>
+  <div class="doc-callout">Sans <code class="doc-inline">device_token</code> enregistré, le canal push est automatiquement ignoré à l'envoi — aucune erreur, la notification est juste sautée pour ce canal.</div>
+
+  <h2>Et ensuite ?</h2>
+  <p>Voir <a routerLink="/documentation/preferences">Gérer les préférences</a> pour le détail de l'endpoint, ou <a routerLink="/documentation/escalade">Canal de secours</a> pour comprendre le comportement quand une notification n'est jamais lue.</p>
+</div>
