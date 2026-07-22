@@ -115,6 +115,12 @@ app.post('/mon-backend/enregistrer-push', async (req, res) => &#123;
   res.sendStatus(200);
 &#125;);</pre>
   <p>Ce même endpoint est documenté en détail dans <a routerLink="/documentation/preferences">Gérer les préférences</a> — c'est <code class="doc-inline">POST /api/preferences</code> avec le champ <code class="doc-inline">device_token</code>.</p>
+  <div class="doc-callout">
+    <b>Un seul enregistrement suffit.</b> Même si l'appel ci-dessus cible un <code class="doc-inline">event_code</code>
+    précis (obligatoire pour l'appel), le <code class="doc-inline">device_token</code> reste valable pour
+    <b>toutes les règles</b> de cet utilisateur une fois enregistré — pas besoin de répéter l'appel pour
+    chaque événement.
+  </div>
   <div class="doc-callout">Sans <code class="doc-inline">device_token</code> enregistré, le canal push est automatiquement ignoré à l'envoi — aucune erreur, la notification est juste sautée pour ce canal.</div>
 
   <h2>Et ensuite ?</h2>
