@@ -51,7 +51,11 @@
     <!-- BANNER SUBSCRIPTION INACTIVE -->
     @if (subscriptionStatut() !== 'active') {
       <div class="banner-warning">
-        <span>⚠️ Vous n'avez pas de forfait actif. Souscrivez pour utiliser l'API.</span>
+        @if (plan() === 'essai') {
+          <span>⚠️ Votre essai gratuit est terminé. Souscrivez à un forfait pour continuer à utiliser l'API.</span>
+        } @else {
+          <span>⚠️ Vous n'avez pas de forfait actif. Souscrivez pour utiliser l'API.</span>
+        }
         <button class="btn-pricing" (click)="allerPricing()">Voir les forfaits →</button>
       </div>
     }
