@@ -108,7 +108,7 @@ app.post('/mon-backend/enregistrer-push', async (req, res) => &#123;
     &#125;,
     body: JSON.stringify(&#123;
       user_id: req.body.user_id,
-      event_code: 'payment_confirmed', <span class="cm">// la règle concernée</span>
+      event_code: 'payment_confirmed', <span class="cm">// n'importe quelle règle existante avec push_actif — obligatoire pour l'appel, mais le token sera valable pour toutes vos règles (voir encadré ci-dessous)</span>
       device_token: req.body.device_token,
     &#125;),
   &#125;);
