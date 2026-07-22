@@ -83,7 +83,7 @@ app.post('/ws-auth', async (req, res) => &#123;
   </p>
   <pre class="doc-code"><span class="cm">// Côté frontend (navigateur)</span>
 echo.private(`notifications.$&#123;clientId&#125;.user_$&#123;userId&#125;`)
-  .listen('NotificationEnvoyee', (data) => &#123;
+  .listen('.NotificationEnvoyee', (data) => &#123;
     afficherNotificationDansLUI(data.message);
 
     <span class="cm">// dès que l'utilisateur la voit vraiment, on informe VOTRE backend :</span>
