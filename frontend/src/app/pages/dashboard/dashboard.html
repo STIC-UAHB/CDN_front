@@ -12,7 +12,7 @@
       <a class="nav-item" [class.active]="activeMenu() === 'dashboard'" (click)="activeMenu.set('dashboard')">
         <span class="nav-icon">▦</span> Dashboard
       </a>
-      <a class="nav-item" [class.active]="activeMenu() === 'notifications'" (click)="activeMenu.set('notifications')">
+      <a class="nav-item" [class.active]="activeMenu() === 'notifications'" (click)="activeMenu.set('notifications'); notifsCmp.charger()">
         <span class="nav-icon">🔔</span> Notifications
       </a>
       <a class="nav-item" [class.active]="activeMenu() === 'preferences'" (click)="activeMenu.set('preferences')">
@@ -87,7 +87,7 @@
       (goToApiKey)="activeMenu.set('settings')">
     </app-stats>
 
-    <app-notifications [hidden]="activeMenu() !== 'notifications'"></app-notifications>
+    <app-notifications #notifsCmp [hidden]="activeMenu() !== 'notifications'"></app-notifications>
 
     <app-regles [hidden]="activeMenu() !== 'preferences'"></app-regles>
 
