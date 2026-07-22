@@ -6,11 +6,10 @@ import { StatsComponent } from './components/stats/stats';
 import { NotificationsComponent } from './components/notifications/notifications';
 import { ReglesComponent } from './components/regles/regles';
 import { SettingsComponent } from './components/settings/settings';
-import { TestNotificationComponent } from './components/test-notification/test-notification';
 
 @Component({
   selector: 'app-dashboard',
-  imports: [StatsComponent, NotificationsComponent, ReglesComponent, SettingsComponent, TestNotificationComponent],
+  imports: [StatsComponent, NotificationsComponent, ReglesComponent, SettingsComponent],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.css',
 })
@@ -27,8 +26,6 @@ export class Dashboard implements OnInit {
   activeMenu         = signal('dashboard');
   subscriptionStatut = signal('inactive');
   plan               = signal('');
-  testEmailRestants  = signal(2);
-  testSmsRestants    = signal(2);
 
   get quotaPct() {
     if (!this.quotaMensuel()) return 0;
@@ -54,8 +51,6 @@ export class Dashboard implements OnInit {
         this.email.set(res.email_contact);
         this.subscriptionStatut.set(res.subscription_statut ?? 'inactive');
         this.plan.set(res.plan ?? '');
-        this.testEmailRestants.set(res.test_email_restants ?? 2);
-        this.testSmsRestants.set(res.test_sms_restants ?? 2);
       },
       error: () => {}
     });

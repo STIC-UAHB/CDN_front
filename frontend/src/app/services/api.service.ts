@@ -34,11 +34,6 @@ export class ApiService {
   // ── Paiement (JWT) ──
   initiatePayment(plan: string) { return this.http.post<any>(`${this.api}/payment/initiate`, { plan }, { headers: this.auth.authHeaders() }); }
 
-  // ── Test notification (JWT) ──
-  testerNotification(canal: string, destinataire: string) {
-    return this.http.post<any>(`${this.api}/test-notification`, { canal, destinataire }, { headers: this.auth.authHeaders() });
-  }
-
   // ── Admin (JWT + is_admin) ──
   adminStats()          { return this.http.get<any>(`${this.api}/admin/stats`, { headers: this.auth.authHeaders() }); }
   adminClients()        { return this.http.get<any[]>(`${this.api}/admin/clients`, { headers: this.auth.authHeaders() }); }

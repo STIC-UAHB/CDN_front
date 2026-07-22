@@ -69,13 +69,6 @@
       </div>
     </div>
 
-    <!-- ── TEST NOTIFICATION (visible uniquement sur l'accueil sans abonnement) ── -->
-    <app-test-notification
-      [hidden]="subscriptionStatut() === 'active' || activeMenu() !== 'dashboard'"
-      [emailRestantsInput]="testEmailRestants()"
-      [smsRestantsInput]="testSmsRestants()">
-    </app-test-notification>
-
     <!-- ── SECTIONS ── -->
     <app-stats
       [hidden]="activeMenu() !== 'dashboard'"
