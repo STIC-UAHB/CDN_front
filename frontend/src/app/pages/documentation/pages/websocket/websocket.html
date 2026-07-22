@@ -5,6 +5,16 @@
     dashboard BabelNotif) — celui qui doit afficher les notifications en temps réel à vos utilisateurs.
   </p>
 
+  <div class="doc-baseurl">
+    <div class="label">URL du serveur WebSocket (Reverb)</div>
+    <div class="url">dazzling-commitment-production-fa21.up.railway.app</div>
+    <div class="hint">
+      Différente de l'URL de l'API — c'est un service séparé, dédié uniquement au temps réel, avec son
+      propre nom de domaine (attribué automatiquement par l'hébergeur). Utilisez-la comme <code class="doc-inline">wsHost</code>
+      à l'étape 1 ci-dessous, en HTTPS/WSS (port 443).
+    </div>
+  </div>
+
   <h2>Pourquoi le WebSocket est différent des autres canaux</h2>
   <p>
     SMS et email sont livrés directement par un opérateur (Orange, SMTP) : une fois envoyés, votre
