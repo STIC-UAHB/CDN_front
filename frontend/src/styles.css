@@ -61,6 +61,19 @@
 }
 .doc-callout b { color: #1e1b4b; }
 
+.doc-baseurl {
+  background: var(--navy); border-radius: 12px; padding: 18px 22px; margin: 0 0 28px;
+}
+.doc-baseurl .label {
+  font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--gray2);
+  margin-bottom: 8px;
+}
+.doc-baseurl .url {
+  font-family: 'Menlo', 'Consolas', monospace; font-size: 16px; font-weight: 700; color: #fff;
+  word-break: break-all;
+}
+.doc-baseurl .hint { font-size: 12px; color: var(--gray2); margin-top: 8px; }
+
 .doc-badge {
   display: inline-block; background: #fef3c7; color: #92400e;
   font-size: 11px; font-weight: 600; padding: 2px 9px; border-radius: 5px; margin-left: 8px;

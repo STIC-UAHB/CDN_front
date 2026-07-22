@@ -31,8 +31,9 @@ import Pusher from 'pusher-js';
 const echo = new Echo(&#123;
   broadcaster: 'reverb',
   key: '6j7g15fjzc4glckgiqyo',   <span class="cm">// clé publique du serveur Reverb, la même pour tous les clients BabelNotif — pas secrète</span>
-  wsHost: 'votre-cdn.com',
-  wsPort: 8080,
+  wsHost: 'dazzling-commitment-production-fa21.up.railway.app',
+  wssPort: 443,
+  forceTLS: true,
   authEndpoint: '/ws-auth',      <span class="cm">// route de VOTRE PROPRE backend, pas celle de BabelNotif</span>
 &#125;);</pre>
   <p>
@@ -49,7 +50,7 @@ const echo = new Echo(&#123;
   </p>
   <pre class="doc-code"><span class="cm">// Côté backend (le vôtre) — exemple générique, à adapter à votre stack</span>
 app.post('/ws-auth', async (req, res) => &#123;
-  const reponse = await fetch('https://votre-cdn.com/broadcasting/auth', &#123;
+  const reponse = await fetch('/api/broadcasting/auth', &#123;
     method: 'POST',
     headers: &#123;
       Authorization: `Bearer $&#123;BABELNOTIF_API_KEY&#125;`,  <span class="cm">// gardée côté serveur uniquement</span>
@@ -82,7 +83,7 @@ echo.private(`notifications.$&#123;clientId&#125;.user_$&#123;userId&#125;`)
   <p>Votre route <code class="doc-inline">/notifications/&#123;id&#125;/lu</code> (côté backend) relaie simplement l'appel vers BabelNotif avec votre clé API, comme à l'étape 1 :</p>
   <pre class="doc-code"><span class="cm">// Côté backend (le vôtre)</span>
 app.post('/notifications/:id/lu', async (req, res) => &#123;
-  await fetch(`https://votre-cdn.com/api/notifications/$&#123;req.params.id&#125;/lu`, &#123;
+  await fetch(`/api/notifications/$&#123;req.params.id&#125;/lu`, &#123;
     method: 'POST',
     headers: &#123; Authorization: `Bearer $&#123;BABELNOTIF_API_KEY&#125;` &#125;,
   &#125;);
@@ -108,7 +109,7 @@ notifications.forEach(afficherNotificationDansLUI);</pre>
   <pre class="doc-code"><span class="cm">// Côté backend (le vôtre)</span>
 app.get('/notifications/manquees', async (req, res) => &#123;
   const reponse = await fetch(
-    `https://votre-cdn.com/api/notifications/feed?user_id=$&#123;req.query.user_id&#125;`,
+    `/api/notifications/feed?user_id=$&#123;req.query.user_id&#125;`,
     &#123; headers: &#123; Authorization: `Bearer $&#123;BABELNOTIF_API_KEY&#125;` &#125; &#125;
   );
   res.json(await reponse.json());

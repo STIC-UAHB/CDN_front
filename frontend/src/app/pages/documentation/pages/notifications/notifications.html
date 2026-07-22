@@ -46,7 +46,7 @@ curl -X POST \
     "to": &#123;"email": "client&#64;exemple.com"&#125;,
     "variables": &#123;"amount": "5000", "name": "Aïssatou"&#125;
   &#125;' \
-  https://votre-cdn.com/api/notify</pre>
+  /api/notify</pre>
   <pre class="doc-code"><span class="cm"># Envoi planifié</span>
 curl -X POST \
   -H "Authorization: Bearer bn_live_..." \
@@ -57,7 +57,7 @@ curl -X POST \
     "to": &#123;"email": "client&#64;exemple.com"&#125;,
     "scheduled_at": "2026-07-10T09:00:00Z"
   &#125;' \
-  https://votre-cdn.com/api/notify</pre>
+  /api/notify</pre>
   <pre class="doc-code"><span class="cm">// Réponse 201</span>
 &#123;
   "message": "Notification(s) mise(s) en queue.",

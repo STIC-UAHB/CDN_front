@@ -33,7 +33,7 @@
   <ol class="doc-steps">
     <li>
       <h3>Créer une nouvelle requête</h3>
-      <p>Méthode <b>POST</b>, URL : <code class="doc-inline">https://votre-cdn.com/api/notify</code></p>
+      <p>Méthode <b>POST</b>, URL : <code class="doc-inline">/api/notify</code></p>
     </li>
     <li>
       <h3>Renseigner les en-têtes (onglet Headers)</h3>
@@ -79,7 +79,7 @@
     "email_actif": true,
     "socket_actif": true
   &#125;' \
-  https://votre-cdn.com/api/regles</pre>
+  /api/regles</pre>
 
   <h3>Étape 2 — Déclencher l'événement à chaque paiement (runtime)</h3>
   <pre class="doc-code">curl -X POST \
@@ -91,7 +91,7 @@
     "to": &#123;"email": "client&#64;exemple.com"&#125;,
     "variables": &#123;"amount": "5000", "name": "Aïssatou"&#125;
   &#125;' \
-  https://votre-cdn.com/api/notify
+  /api/notify
 
 <span class="cm">// Réponse 201</span>
 &#123;
@@ -101,7 +101,7 @@
 &#125;</pre>
 
   <h3>Étape 3 — Gérer la réponse dans votre code</h3>
-  <pre class="doc-code">const res = await fetch('https://votre-cdn.com/api/notify', &#123;
+  <pre class="doc-code">const res = await fetch('/api/notify', &#123;
   method: 'POST',
   headers: &#123;
     Authorization: `Bearer $&#123;BABELNOTIF_API_KEY&#125;`,

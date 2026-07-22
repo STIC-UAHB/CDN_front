@@ -100,7 +100,7 @@ messaging.onBackgroundMessage((payload) => &#123;
   <p>Comme pour l'authentification WebSocket, c'est votre backend (qui détient la clé API) qui fait l'appel réel :</p>
   <pre class="doc-code"><span class="cm">// Côté backend (le vôtre)</span>
 app.post('/mon-backend/enregistrer-push', async (req, res) => &#123;
-  await fetch('https://votre-cdn.com/api/preferences', &#123;
+  await fetch('/api/preferences', &#123;
     method: 'POST',
     headers: &#123;
       Authorization: `Bearer $&#123;BABELNOTIF_API_KEY&#125;`,

@@ -40,14 +40,14 @@
     "event_code": "payment_confirmed",
     "sms_actif": false
   &#125;' \
-  https://votre-cdn.com/api/preferences</pre>
+  /api/preferences</pre>
 
   <h3>Exemple — désactiver complètement une règle non critique</h3>
   <pre class="doc-code">curl -X POST \
   -H "Authorization: Bearer bn_live_..." \
   -H "Content-Type: application/json" \
   -d '&#123;"user_id": "USR123", "event_code": "weekly_report", "rule_actif": false&#125;' \
-  https://votre-cdn.com/api/preferences</pre>
+  /api/preferences</pre>
   <div class="doc-callout">
     <b>Note :</b> une règle marquée <code class="doc-inline">non_desactivable</code> (typiquement un OTP de sécurité)
     ignore <code class="doc-inline">rule_actif</code> — l'utilisateur ne peut pas la couper.
@@ -64,7 +64,7 @@
   <p>Renvoie toutes les préférences enregistrées pour cet utilisateur, avec la règle associée.</p>
   <pre class="doc-code">curl \
   -H "Authorization: Bearer bn_live_..." \
-  https://votre-cdn.com/api/preferences/USR123</pre>
+  /api/preferences/USR123</pre>
 
   <h2>Et ensuite ?</h2>
   <p>Voir comment tout ça s'articule avec l'envoi dans <a routerLink="/documentation/notifications">Envoyer des notifications</a>.</p>
