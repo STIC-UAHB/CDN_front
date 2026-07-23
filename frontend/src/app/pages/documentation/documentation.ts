@@ -1,6 +1,7 @@
-import { Component, signal } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { NavigationEnd, Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { filter } from 'rxjs/operators';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-documentation',
@@ -9,7 +10,11 @@ import { filter } from 'rxjs/operators';
   styleUrl: './documentation.css',
 })
 export class Documentation {
+  private authService = inject(AuthService);
   sidebarOuverte = signal(false);
+
+  // Si l'utilisateur est connecté, "retour au site" ramène au dashboard plutôt qu'à l'accueil public.
+  retourUrl = this.authService.isLoggedIn() ? '/dashboard' : '/';
 
   constructor(router: Router) {
     router.events
