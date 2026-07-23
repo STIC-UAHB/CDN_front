@@ -29,6 +29,19 @@
       <a class="nav-item" [class.active]="activeMenu() === 'documentation'" (click)="activeMenu.set('documentation')">
         <span class="nav-icon">📄</span> Documentation
       </a>
+      @if (activeMenu() === 'documentation') {
+        <div class="nav-submenu">
+          <a class="nav-subitem" [class.active]="activeDocPage() === 'introduction'" (click)="activeDocPage.set('introduction')">Introduction</a>
+          <a class="nav-subitem" [class.active]="activeDocPage() === 'demarrage'" (click)="activeDocPage.set('demarrage')">Démarrage</a>
+          <a class="nav-subitem" [class.active]="activeDocPage() === 'integration-api'" (click)="activeDocPage.set('integration-api')">Intégrer l'API</a>
+          <a class="nav-subitem" [class.active]="activeDocPage() === 'notifications'" (click)="activeDocPage.set('notifications')">Envoyer des notifications</a>
+          <a class="nav-subitem" [class.active]="activeDocPage() === 'regles'" (click)="activeDocPage.set('regles')">Gérer les règles</a>
+          <a class="nav-subitem" [class.active]="activeDocPage() === 'preferences'" (click)="activeDocPage.set('preferences')">Gérer les préférences</a>
+          <a class="nav-subitem" [class.active]="activeDocPage() === 'websocket'" (click)="activeDocPage.set('websocket')">Intégrer le WebSocket</a>
+          <a class="nav-subitem" [class.active]="activeDocPage() === 'push'" (click)="activeDocPage.set('push')">Intégrer le Push</a>
+          <a class="nav-subitem" [class.active]="activeDocPage() === 'escalade'" (click)="activeDocPage.set('escalade')">Canal de secours</a>
+        </div>
+      }
     </nav>
 
     <div class="sidebar-footer">
@@ -97,7 +110,19 @@
     </app-settings>
 
     @if (activeMenu() === 'documentation') {
-      <iframe class="doc-iframe" [src]="documentationUrl" title="Documentation BabelNotif"></iframe>
+      <div class="doc-embed">
+        @switch (activeDocPage()) {
+          @case ('introduction')     { <app-doc-introduction /> }
+          @case ('demarrage')        { <app-doc-demarrage /> }
+          @case ('integration-api')  { <app-doc-integration-api /> }
+          @case ('notifications')    { <app-doc-notifications /> }
+          @case ('regles')           { <app-doc-regles /> }
+          @case ('preferences')      { <app-doc-preferences /> }
+          @case ('websocket')        { <app-doc-websocket /> }
+          @case ('push')             { <app-doc-push /> }
+          @case ('escalade')         { <app-doc-escalade /> }
+        }
+      </div>
     }
 
   </main>

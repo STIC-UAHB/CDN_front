@@ -1,16 +1,28 @@
 import { Component, signal, OnInit, inject } from '@angular/core';
 import { Router } from '@angular/router';
-import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { AuthService } from '../../services/auth.service';
 import { ApiService } from '../../services/api.service';
 import { StatsComponent } from './components/stats/stats';
 import { NotificationsComponent } from './components/notifications/notifications';
 import { ReglesComponent } from './components/regles/regles';
 import { SettingsComponent } from './components/settings/settings';
+import { DocIntroduction } from '../documentation/pages/introduction/introduction';
+import { DocDemarrage } from '../documentation/pages/demarrage/demarrage';
+import { DocIntegrationApi } from '../documentation/pages/integration-api/integration-api';
+import { DocNotifications } from '../documentation/pages/notifications/notifications';
+import { DocRegles } from '../documentation/pages/regles/regles';
+import { DocPreferences } from '../documentation/pages/preferences/preferences';
+import { DocWebsocket } from '../documentation/pages/websocket/websocket';
+import { DocPush } from '../documentation/pages/push/push';
+import { DocEscalade } from '../documentation/pages/escalade/escalade';
 
 @Component({
   selector: 'app-dashboard',
-  imports: [StatsComponent, NotificationsComponent, ReglesComponent, SettingsComponent],
+  imports: [
+    StatsComponent, NotificationsComponent, ReglesComponent, SettingsComponent,
+    DocIntroduction, DocDemarrage, DocIntegrationApi, DocNotifications,
+    DocRegles, DocPreferences, DocWebsocket, DocPush, DocEscalade,
+  ],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.css',
 })
@@ -18,9 +30,8 @@ export class Dashboard implements OnInit {
   private authService = inject(AuthService);
   private apiService  = inject(ApiService);
   private router      = inject(Router);
-  private sanitizer    = inject(DomSanitizer);
 
-  documentationUrl: SafeResourceUrl = this.sanitizer.bypassSecurityTrustResourceUrl('/documentation/introduction');
+  activeDocPage = signal('introduction');
 
   nom                = signal('');
   apiKey             = signal('');

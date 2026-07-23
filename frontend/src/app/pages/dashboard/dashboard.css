@@ -66,6 +66,21 @@
 .nav-item.active { background: var(--primary); color: #fff; }
 .nav-icon { font-size: 14px; width: 18px; text-align: center; }
 
+.nav-submenu {
+  display: flex; flex-direction: column;
+  margin: 2px 0 6px 30px;
+  border-left: 1px solid rgba(255,255,255,0.1);
+  padding-left: 10px;
+}
+.nav-subitem {
+  padding: 6px 10px; border-radius: 6px;
+  font-size: 12.5px; color: rgba(255,255,255,0.45);
+  cursor: pointer; transition: all 0.15s;
+  text-decoration: none; margin-bottom: 1px;
+}
+.nav-subitem:hover { background: rgba(255,255,255,0.06); color: #fff; }
+.nav-subitem.active { background: rgba(255,255,255,0.1); color: #fff; font-weight: 600; }
+
 .sidebar-footer { padding: 16px 12px; border-top: 1px solid rgba(255,255,255,0.08); }
 .btn-logout {
   width: 100%; background: rgba(255,255,255,0.06);
@@ -400,12 +415,11 @@
 }
 .page-info { font-size: 13px; color: var(--gray); }
 
-/* ── DOCUMENTATION (iframe) ── */
-.doc-iframe {
-  flex: 1;
-  width: 100%;
-  min-height: calc(100vh - 52px);
-  border: none;
+/* ── DOCUMENTATION (intégrée, même menu que le dashboard) ── */
+.doc-embed {
+  background: #fff;
+  max-width: 1100px;
+  padding: 28px 32px 48px;
 }
 
 /* ── RESPONSIVE (mobile / tablette) ── */
