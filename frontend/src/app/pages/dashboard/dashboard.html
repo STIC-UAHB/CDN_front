@@ -26,7 +26,7 @@
       <a class="nav-item" (click)="allerPricing()">
         <span class="nav-icon">★</span> Forfaits
       </a>
-      <a class="nav-item" routerLink="/documentation" target="_blank">
+      <a class="nav-item" [class.active]="activeMenu() === 'documentation'" (click)="activeMenu.set('documentation')">
         <span class="nav-icon">📄</span> Documentation
       </a>
     </nav>
@@ -95,6 +95,10 @@
       [email]="email()"
       (nomUpdated)="nom.set($event)">
     </app-settings>
+
+    @if (activeMenu() === 'documentation') {
+      <iframe class="doc-iframe" [src]="documentationUrl" title="Documentation BabelNotif"></iframe>
+    }
 
   </main>
 </div>

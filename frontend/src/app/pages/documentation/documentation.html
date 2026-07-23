@@ -1,6 +1,6 @@
 <div class="doc-mobile-bar">
   <button class="doc-burger" (click)="toggleSidebar()">☰</button>
-  <div class="logo" [routerLink]="retourUrl">
+  <div class="logo" [routerLink]="dansIframe ? null : retourUrl">
     <div class="logo-sq">BN</div>
     <span class="logo-nm">BabelNotif</span>
   </div>
@@ -10,11 +10,13 @@
 
 <div class="doc-layout">
   <aside class="doc-sidebar" [class.open]="sidebarOuverte()">
-    <div class="doc-sidebar-logo" [routerLink]="retourUrl">
+    <div class="doc-sidebar-logo">
       <div class="logo-sq">BN</div>
       <span class="logo-nm">BabelNotif</span>
     </div>
-    <a class="doc-back-link" [routerLink]="retourUrl">← Retour au site</a>
+    @if (!dansIframe) {
+      <a class="doc-back-link" [routerLink]="retourUrl">← Retour au site</a>
+    }
 
     <nav class="doc-sidebar-inner">
       <div class="doc-side-group">

@@ -13,7 +13,11 @@ export class Documentation {
   private authService = inject(AuthService);
   sidebarOuverte = signal(false);
 
-  // Si l'utilisateur est connecté, "retour au site" ramène au dashboard plutôt qu'à l'accueil public.
+  // Dans une iframe (doc affichée depuis l'onglet Documentation du dashboard),
+  // pas de lien de retour — on est déjà dans le dashboard, inutile de le recharger dedans.
+  dansIframe = typeof window !== 'undefined' && window.self !== window.top;
+
+  // Si l'utilisateur est connecté (hors iframe), "retour au site" ramène au dashboard plutôt qu'à l'accueil public.
   retourUrl = this.authService.isLoggedIn() ? '/dashboard' : '/';
 
   constructor(router: Router) {

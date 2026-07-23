@@ -1,5 +1,6 @@
 import { Component, signal, OnInit, inject } from '@angular/core';
-import { Router, RouterLink } from '@angular/router';
+import { Router } from '@angular/router';
+import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { AuthService } from '../../services/auth.service';
 import { ApiService } from '../../services/api.service';
 import { StatsComponent } from './components/stats/stats';
@@ -9,7 +10,7 @@ import { SettingsComponent } from './components/settings/settings';
 
 @Component({
   selector: 'app-dashboard',
-  imports: [RouterLink, StatsComponent, NotificationsComponent, ReglesComponent, SettingsComponent],
+  imports: [StatsComponent, NotificationsComponent, ReglesComponent, SettingsComponent],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.css',
 })
@@ -17,6 +18,9 @@ export class Dashboard implements OnInit {
   private authService = inject(AuthService);
   private apiService  = inject(ApiService);
   private router      = inject(Router);
+  private sanitizer    = inject(DomSanitizer);
+
+  documentationUrl: SafeResourceUrl = this.sanitizer.bypassSecurityTrustResourceUrl('/documentation/introduction');
 
   nom                = signal('');
   apiKey             = signal('');

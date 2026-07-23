@@ -400,6 +400,14 @@
 }
 .page-info { font-size: 13px; color: var(--gray); }
 
+/* ── DOCUMENTATION (iframe) ── */
+.doc-iframe {
+  flex: 1;
+  width: 100%;
+  min-height: calc(100vh - 52px);
+  border: none;
+}
+
 /* ── RESPONSIVE (mobile / tablette) ── */
 @media (max-width: 860px) {
   .layout { flex-direction: column; }
