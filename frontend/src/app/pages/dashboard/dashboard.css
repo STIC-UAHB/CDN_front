@@ -99,12 +99,18 @@
 .topbar-right { display: flex; align-items: center; gap: 12px; }
 .topbar-account { display: flex; align-items: center; gap: 8px; }
 .account-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--green); }
+.account-dot.inactive { background: #f87171; }
 .account-name { font-size: 13px; color: rgba(255,255,255,0.8); }
 .account-badge {
   font-size: 11px; font-weight: 600;
   background: rgba(16,185,129,0.2);
   color: #6ee7b7;
   padding: 2px 8px; border-radius: 10px;
+  white-space: nowrap;
+}
+.account-badge.inactive {
+  background: rgba(248,113,113,0.15);
+  color: #fca5a5;
 }
 
 /* ── BANNER WARNING SUBSCRIPTION ── */

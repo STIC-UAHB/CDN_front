@@ -1,5 +1,5 @@
 import { Component, signal, OnInit, inject } from '@angular/core';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { ApiService } from '../../services/api.service';
 import { StatsComponent } from './components/stats/stats';
@@ -9,7 +9,7 @@ import { SettingsComponent } from './components/settings/settings';
 
 @Component({
   selector: 'app-dashboard',
-  imports: [StatsComponent, NotificationsComponent, ReglesComponent, SettingsComponent],
+  imports: [RouterLink, StatsComponent, NotificationsComponent, ReglesComponent, SettingsComponent],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.css',
 })
@@ -26,10 +26,27 @@ export class Dashboard implements OnInit {
   activeMenu         = signal('dashboard');
   subscriptionStatut = signal('inactive');
   plan               = signal('');
+  subscriptionFin    = signal<string | null>(null);
 
   get quotaPct() {
     if (!this.quotaMensuel()) return 0;
     return Math.round((this.quotaUtilise() / this.quotaMensuel()) * 100);
+  }
+
+  get planLabel(): string {
+    const labels: Record<string, string> = {
+      essai: 'Essai gratuit',
+      starter: 'Starter',
+      pro: 'Pro',
+      business: 'Business',
+    };
+    return labels[this.plan()] || 'Aucun plan';
+  }
+
+  get subscriptionFinFormatee(): string {
+    const fin = this.subscriptionFin();
+    if (!fin) return '';
+    return new Date(fin).toLocaleDateString('fr-FR', { day: '2-digit', month: 'long', year: 'numeric' });
   }
 
   ngOnInit() {
@@ -51,6 +68,7 @@ export class Dashboard implements OnInit {
         this.email.set(res.email_contact);
         this.subscriptionStatut.set(res.subscription_statut ?? 'inactive');
         this.plan.set(res.plan ?? '');
+        this.subscriptionFin.set(res.subscription_fin ?? null);
       },
       error: () => {}
     });

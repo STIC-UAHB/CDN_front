@@ -26,6 +26,9 @@
       <a class="nav-item" (click)="allerPricing()">
         <span class="nav-icon">★</span> Forfaits
       </a>
+      <a class="nav-item" routerLink="/documentation" target="_blank" rel="noopener">
+        <span class="nav-icon">📄</span> Documentation
+      </a>
     </nav>
 
     <div class="sidebar-footer">
@@ -41,9 +44,11 @@
       <span class="topbar-title">Account Dashboard</span>
       <div class="topbar-right">
         <div class="topbar-account">
-          <span class="account-dot"></span>
+          <span class="account-dot" [class.inactive]="subscriptionStatut() !== 'active'"></span>
           <span class="account-name">{{ nom() }}</span>
-          <span class="account-badge">Actif</span>
+          <span class="account-badge" [class.inactive]="subscriptionStatut() !== 'active'">
+            {{ planLabel }}@if (subscriptionFinFormatee) { · jusqu'au {{ subscriptionFinFormatee }} }
+          </span>
         </div>
       </div>
     </div>
