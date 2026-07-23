@@ -32,6 +32,17 @@ export class Dashboard implements OnInit {
   private router      = inject(Router);
 
   activeDocPage = signal('introduction');
+  docMenuOuvert = signal(false);
+
+  toggleDocumentation() {
+    if (this.activeMenu() === 'documentation' && this.docMenuOuvert()) {
+      this.docMenuOuvert.set(false);
+      this.activeMenu.set('dashboard');
+    } else {
+      this.activeMenu.set('documentation');
+      this.docMenuOuvert.set(true);
+    }
+  }
 
   nom                = signal('');
   apiKey             = signal('');

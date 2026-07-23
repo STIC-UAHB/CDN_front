@@ -26,10 +26,10 @@
       <a class="nav-item" (click)="allerPricing()">
         <span class="nav-icon">★</span> Forfaits
       </a>
-      <a class="nav-item" [class.active]="activeMenu() === 'documentation'" (click)="activeMenu.set('documentation')">
+      <a class="nav-item" [class.active]="activeMenu() === 'documentation' && docMenuOuvert()" (click)="toggleDocumentation()">
         <span class="nav-icon">📄</span> Documentation
       </a>
-      @if (activeMenu() === 'documentation') {
+      @if (activeMenu() === 'documentation' && docMenuOuvert()) {
         <div class="nav-submenu">
           <a class="nav-subitem" [class.active]="activeDocPage() === 'introduction'" (click)="activeDocPage.set('introduction')">Introduction</a>
           <a class="nav-subitem" [class.active]="activeDocPage() === 'demarrage'" (click)="activeDocPage.set('demarrage')">Démarrage</a>
@@ -109,7 +109,7 @@
       (nomUpdated)="nom.set($event)">
     </app-settings>
 
-    @if (activeMenu() === 'documentation') {
+    @if (activeMenu() === 'documentation' && docMenuOuvert()) {
       <div class="doc-embed">
         @switch (activeDocPage()) {
           @case ('introduction')     { <app-doc-introduction /> }
