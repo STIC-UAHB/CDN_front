@@ -24,6 +24,8 @@ export class ApiService {
   // ── Règles (JWT) ──
   getRegles()                { return this.http.get<any[]>(`${this.api}/regles`, { headers: this.auth.authHeaders() }); }
   createRegle(data: any)     { return this.http.post<any>(`${this.api}/regles`, data, { headers: this.auth.authHeaders() }); }
+  updateRegle(id: number, data: any) { return this.http.put<any>(`${this.api}/regles/${id}`, data, { headers: this.auth.authHeaders() }); }
+  deleteRegle(id: number)    { return this.http.delete<any>(`${this.api}/regles/${id}`, { headers: this.auth.authHeaders() }); }
   importRegles(data: any[])  { return this.http.post<any>(`${this.api}/regles/import`, data, { headers: this.auth.authHeaders() }); }
   getReglesTemplate()        { return this.http.get(`${this.api}/regles/template`, { headers: this.auth.authHeaders(), responseType: 'blob' as 'json' }); }
 

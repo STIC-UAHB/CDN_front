@@ -11,7 +11,7 @@
         ⬆ Importer JSON
         <input type="file" accept=".json" (change)="importer($event)" hidden>
       </label>
-      <button class="btn-primary" (click)="showForm.set(!showForm())">+ Nouvelle règle</button>
+      <button class="btn-primary" (click)="showForm() ? annulerForm() : showForm.set(true)">+ Nouvelle règle</button>
     </div>
   </div>
 
@@ -21,7 +21,7 @@
   <!-- Formulaire nouvelle règle -->
   @if (showForm()) {
     <div class="form-card">
-      <div class="form-title">Nouvelle règle</div>
+      <div class="form-title">{{ formTitle }}</div>
 
       <div class="form-grid">
         <div class="form-group">
@@ -75,8 +75,8 @@
       </div>
 
       <div class="form-footer">
-        <button class="btn-cancel" (click)="showForm.set(false)">Annuler</button>
-        <button class="btn-primary" [disabled]="loading()" (click)="creer()">{{ btnLabel }}</button>
+        <button class="btn-cancel" (click)="annulerForm()">Annuler</button>
+        <button class="btn-primary" [disabled]="loading()" (click)="enregistrer()">{{ btnLabel }}</button>
       </div>
     </div>
   }
@@ -102,6 +102,10 @@
           @if (regle.description) {
             <div class="regle-desc">{{ regle.description }}</div>
           }
+          <div class="regle-actions">
+            <button class="btn-regle-edit" (click)="modifier(regle)">✎ Modifier</button>
+            <button class="btn-regle-delete" (click)="supprimer(regle)">🗑 Supprimer</button>
+          </div>
         </div>
       }
     </div>

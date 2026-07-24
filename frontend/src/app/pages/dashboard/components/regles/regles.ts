@@ -22,15 +22,17 @@ interface Regle {
 export class ReglesComponent implements OnInit {
   private apiService = inject(ApiService);
 
-  regles   = signal<Regle[]>([]);
-  showForm = signal(false);
-  loading  = signal(false);
-  erreur   = signal('');
-  succes   = signal('');
-  form     = signal({ event_code: '', message_template: '', description: '', sms_actif: false, email_actif: false, push_actif: false, socket_actif: false, non_desactivable: false });
+  regles     = signal<Regle[]>([]);
+  showForm   = signal(false);
+  loading    = signal(false);
+  erreur     = signal('');
+  succes     = signal('');
+  editingId  = signal<number | null>(null);
+  form       = signal({ event_code: '', message_template: '', description: '', sms_actif: false, email_actif: false, push_actif: false, socket_actif: false, non_desactivable: false });
 
   templatePlaceholder = 'ex: Bonjour {nom}, votre quota est à {valeur}%';
-  get btnLabel() { return this.loading() ? 'Enregistrement...' : 'Enregistrer'; }
+  get btnLabel() { return this.loading() ? 'Enregistrement...' : (this.editingId() ? 'Mettre à jour' : 'Enregistrer'); }
+  get formTitle() { return this.editingId() ? 'Modifier la règle' : 'Nouvelle règle'; }
 
   ngOnInit() { this.charger(); }
 
@@ -43,7 +45,7 @@ export class ReglesComponent implements OnInit {
     this.form.set({ ...this.form(), [field]: value });
   }
 
-  creer() {
+  enregistrer() {
     const f = this.form();
     if (!f.event_code || !f.message_template) {
       this.erreur.set('Le code événement et le message sont obligatoires.');
@@ -53,20 +55,63 @@ export class ReglesComponent implements OnInit {
     this.erreur.set('');
     this.succes.set('');
 
-    this.apiService.createRegle(f)
-      .subscribe({
-        next: (regle) => {
+    const id = this.editingId();
+    const requete = id ? this.apiService.updateRegle(id, f) : this.apiService.createRegle(f);
+
+    requete.subscribe({
+      next: (regle) => {
+        if (id) {
+          this.regles.set(this.regles().map(r => r.id === id ? regle : r));
+          this.succes.set('Règle mise à jour avec succès.');
+        } else {
           this.regles.set([...this.regles(), regle]);
           this.succes.set('Règle créée avec succès.');
-          this.form.set({ event_code: '', message_template: '', description: '', sms_actif: false, email_actif: false, push_actif: false, socket_actif: false, non_desactivable: false });
-          this.loading.set(false);
-          setTimeout(() => { this.showForm.set(false); this.succes.set(''); }, 1500);
-        },
-        error: (err) => {
-          this.erreur.set(err.error?.message || 'Erreur lors de la création.');
-          this.loading.set(false);
         }
-      });
+        this.annulerForm();
+        this.loading.set(false);
+        setTimeout(() => this.succes.set(''), 1500);
+      },
+      error: (err) => {
+        this.erreur.set(err.error?.message || 'Erreur lors de l\'enregistrement.');
+        this.loading.set(false);
+      }
+    });
+  }
+
+  modifier(regle: Regle) {
+    this.editingId.set(regle.id);
+    this.form.set({
+      event_code: regle.event_code,
+      message_template: regle.message_template,
+      description: regle.description || '',
+      sms_actif: regle.sms_actif,
+      email_actif: regle.email_actif,
+      push_actif: regle.push_actif,
+      socket_actif: regle.socket_actif,
+      non_desactivable: regle.non_desactivable,
+    });
+    this.showForm.set(true);
+    this.erreur.set('');
+    this.succes.set('');
+  }
+
+  supprimer(regle: Regle) {
+    if (!confirm(`Supprimer la règle "${regle.event_code}" ? Cette action est irréversible.`)) return;
+
+    this.apiService.deleteRegle(regle.id).subscribe({
+      next: () => {
+        this.regles.set(this.regles().filter(r => r.id !== regle.id));
+        this.succes.set('Règle supprimée.');
+        setTimeout(() => this.succes.set(''), 1500);
+      },
+      error: (err) => this.erreur.set(err.error?.message || 'Erreur lors de la suppression.')
+    });
+  }
+
+  annulerForm() {
+    this.showForm.set(false);
+    this.editingId.set(null);
+    this.form.set({ event_code: '', message_template: '', description: '', sms_actif: false, email_actif: false, push_actif: false, socket_actif: false, non_desactivable: false });
   }
 
   telechargerTemplate() {
