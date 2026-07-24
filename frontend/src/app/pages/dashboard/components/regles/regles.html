@@ -90,22 +90,24 @@
         <div class="regle-card">
           <div class="regle-top">
             <code class="regle-code">{{ regle.event_code }}</code>
-            <div class="regle-canaux">
-              @if (regle.sms_actif)   { <span class="canal-badge sms">SMS</span> }
-              @if (regle.email_actif) { <span class="canal-badge email">Email</span> }
-              @if (regle.push_actif)    { <span class="canal-badge push">Push</span> }
-              @if (regle.socket_actif)      { <span class="canal-badge socket">WebSocket</span> }
-              @if (regle.non_desactivable) { <span class="canal-badge locked">Obligatoire</span> }
+            <div class="regle-top-right">
+              <div class="regle-canaux">
+                @if (regle.sms_actif)   { <span class="canal-badge sms">SMS</span> }
+                @if (regle.email_actif) { <span class="canal-badge email">Email</span> }
+                @if (regle.push_actif)    { <span class="canal-badge push">Push</span> }
+                @if (regle.socket_actif)      { <span class="canal-badge socket">WebSocket</span> }
+                @if (regle.non_desactivable) { <span class="canal-badge locked">Obligatoire</span> }
+              </div>
+              <div class="regle-icons-row">
+                <button class="btn-icon" (click)="modifier(regle)" title="Modifier">✎</button>
+                <button class="btn-icon btn-icon-delete" (click)="supprimer(regle)" title="Supprimer">🗑</button>
+              </div>
             </div>
           </div>
           <div class="regle-msg">{{ regle.message_template }}</div>
           @if (regle.description) {
             <div class="regle-desc">{{ regle.description }}</div>
           }
-          <div class="regle-actions">
-            <button class="btn-regle-edit" (click)="modifier(regle)">✎ Modifier</button>
-            <button class="btn-regle-delete" (click)="supprimer(regle)">🗑 Supprimer</button>
-          </div>
         </div>
       }
     </div>
