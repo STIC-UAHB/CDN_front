@@ -78,6 +78,14 @@
       </div>
     }
 
+    <!-- BANNER QUOTA BAS -->
+    @if (quotaBas) {
+      <div class="banner-warning">
+        <span>⚠️ Il ne vous reste plus que {{ quotaRestant }} notification(s) ce mois-ci. Un email de rappel vous a été envoyé.</span>
+        <button class="btn-pricing" (click)="allerPricing()">Voir les forfaits →</button>
+      </div>
+    }
+
     <!-- BANNER QUOTA -->
     <div class="banner-info">
       <span class="banner-ic">◆</span>

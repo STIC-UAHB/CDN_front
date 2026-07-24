@@ -1,23 +1,58 @@
-import { Component, signal, inject } from '@angular/core';
+import { Component, signal, inject, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { ApiService } from '../../services/api.service';
-import { DecimalPipe } from '@angular/common';
+import { DecimalPipe, TitleCasePipe } from '@angular/common';
 
 @Component({
   selector: 'app-pricing',
-  imports: [DecimalPipe],
+  imports: [DecimalPipe, TitleCasePipe],
   templateUrl: './pricing.html',
   styleUrl: './pricing.css',
 })
-export class Pricing {
+export class Pricing implements OnInit {
   private router     = inject(Router);
   private authService = inject(AuthService);
   private apiService  = inject(ApiService);
 
-  loading    = signal<string>('');
-  erreur     = signal('');
-  planActuel = signal(this.authService.getPlan());
+  loading             = signal<string>('');
+  erreur              = signal('');
+  planActuel          = signal(this.authService.getPlan());
+  subscriptionStatut  = signal(this.authService.getSubscriptionStatut());
+  quotaMensuel        = signal(this.authService.getQuotaMensuel());
+  quotaUtilise        = signal(this.authService.getQuotaUtilise());
+  subscriptionFin     = signal<string | null>(null);
+
+  get quotaRestant() {
+    return Math.max(0, this.quotaMensuel() - this.quotaUtilise());
+  }
+
+  get abonnementActif() {
+    return this.subscriptionStatut() === 'active';
+  }
+
+  get subscriptionFinFormatee(): string {
+    const fin = this.subscriptionFin();
+    if (!fin) return '';
+    return new Date(fin).toLocaleDateString('fr-FR', { day: '2-digit', month: 'long', year: 'numeric' });
+  }
+
+  ngOnInit() {
+    this.apiService.me().subscribe({
+      next: (res) => {
+        this.planActuel.set(res.plan ?? '');
+        this.subscriptionStatut.set(res.subscription_statut ?? 'inactive');
+        this.quotaMensuel.set(res.quota_mensuel ?? 0);
+        this.quotaUtilise.set(res.quota_utilise ?? 0);
+        this.subscriptionFin.set(res.subscription_fin ?? null);
+      },
+      error: () => {}
+    });
+  }
+
+  quotaApresAchat(quotaPlan: number): number {
+    return this.abonnementActif ? quotaPlan + this.quotaRestant : quotaPlan;
+  }
 
   plans = [
     { id: 'starter',  nom: 'Starter',  prix: 100,   quota: 1000,  desc: 'Idéal pour démarrer',                  color: '#6366f1' },

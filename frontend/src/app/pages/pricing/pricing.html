@@ -10,6 +10,15 @@
     <div class="alert-error">{{ erreur() }}</div>
   }
 
+  @if (abonnementActif) {
+    <div class="alert-info">
+      Abonnement actuel : <strong>{{ planActuel() | titlecase }}</strong> —
+      <strong>{{ quotaRestant }}</strong> notification(s) restante(s)
+      @if (subscriptionFinFormatee) { , valable jusqu'au <strong>{{ subscriptionFinFormatee }}</strong> }.
+      Se réabonner cumule ce reste avec le nouveau forfait.
+    </div>
+  }
+
   <div class="plans-grid">
     @for (plan of plans; track plan.id) {
       <div class="plan-card" [class.popular]="plan.badge" [class.current]="planActuel() === plan.id">
@@ -32,6 +41,11 @@
             <li>✓ WebSocket (Reverb) illimité</li>
             <li>✓ API key dédiée</li>
           </ul>
+          @if (abonnementActif && planActuel() !== plan.id) {
+            <p class="cumul-note">
+              Avec cumul : {{ quotaApresAchat(plan.quota) | number }} notifications
+            </p>
+          }
           @if (planActuel() === plan.id) {
             <button class="btn-actuel" [style.borderColor]="plan.color" [style.color]="plan.color" disabled>
               Forfait en cours

@@ -59,6 +59,16 @@ export class Dashboard implements OnInit {
     return Math.round((this.quotaUtilise() / this.quotaMensuel()) * 100);
   }
 
+  get quotaRestant() {
+    return Math.max(0, this.quotaMensuel() - this.quotaUtilise());
+  }
+
+  get quotaBas(): boolean {
+    if (!this.quotaMensuel() || this.subscriptionStatut() !== 'active') return false;
+    const seuil = Math.max(1, Math.ceil(this.quotaMensuel() * 0.1));
+    return this.quotaRestant <= seuil;
+  }
+
   get planLabel(): string {
     const labels: Record<string, string> = {
       essai: 'Essai gratuit',
